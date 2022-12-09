@@ -44,8 +44,8 @@ seq:
     type: u2
   - id: rng # range
     type: u2
-  - id: should_be_zero
-    contents: [0x00, 0x00]
+  - id: unknown0
+    type: u2
   - id: exp
     type: u2
   - id: unknown
