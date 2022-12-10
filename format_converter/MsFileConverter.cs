@@ -29,7 +29,7 @@ namespace format_converter
                 var ms = MsFile.FromFile(filePath);
                 string newName = ms.Name + "-" + fileName;
                 string json = JsonConvert.SerializeObject(ms, Formatting.Indented, settings);
-                await File.WriteAllTextAsync($"MSJson/{newName}.json", json);
+                await File.WriteAllTextAsync($"./MSJson/{newName}.json", json);
                 Console.WriteLine($"successfully converted to json {fileName}");
             }
             catch (Exception e)
@@ -141,7 +141,7 @@ namespace format_converter
             string fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
             fileName = Regex.Replace(fileName, ".json", "");
             fileName = fileName.Split("-").Last();
-            await File.WriteAllBytesAsync($"MSDT/{fileName}", asBytes);
+            await File.WriteAllBytesAsync($"./MSDT/{fileName}", asBytes);
             Console.WriteLine($"successfully converted to DataTable {fileName}");
         }
     }
