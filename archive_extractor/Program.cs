@@ -34,7 +34,7 @@ internal class Program
             if (!filenames.Any())
             {
                 Console.WriteLine($"empty folder: {args[0]}");
-                return;
+                goto END;
             }
 
             await ExtractArchiveMany(filenames);
@@ -43,21 +43,22 @@ internal class Program
         {
             await ExtractArchiveMany(args);
         }
+        
+        END:
         Console.WriteLine("Press enter to close...");
         Console.ReadLine();
     }   
 
-    static async Task ExtractArchiveMany(IEnumerable<string> filenames)
+    static async Task ExtractArchiveMany(IEnumerable<string> filepaths)
     {
-        filenames = filenames.Select(w => w.Split(Path.DirectorySeparatorChar).Last());
-        IEnumerable<string> dats = filenames.Where(w => w.Contains(".dat"));
+        IEnumerable<string> datPaths = filepaths.Where(w => w.Contains(".dat"));
         var tasks = new List<Task>();
-        if(!dats.Any())
+        if(!datPaths.Any())
         {
             Console.WriteLine("no .dat files provided!");
             return;
         }
-        foreach (string dat in dats)
+        foreach (string dat in datPaths)
         {
             string noExt = dat[..(dat.Length - 4)];
             if (!File.Exists($"{noExt}.dir"))
@@ -67,7 +68,9 @@ internal class Program
             }
             tasks.Add(ExtractArchive(noExt));
         }
+        Console.WriteLine("Extracting archives...");
         await Task.WhenAll(tasks);
+        Console.WriteLine("Finished extracting archives!");
     }
 
     static async Task ExtractArchive(string name)
@@ -112,15 +115,16 @@ internal class Program
         async Task CreateFile(Entry entry)
         {
             string entry_name = entry.file_name;
-            if (entry_name == "/_______.___") return;
+            if (entry_name == "/_______.___" || entry.length == 0) return;
             if (!dat.body.entries.TryGetValue(entry.dat_offset, out byte[] data))
             {
-                Console.WriteLine($"{name}:\n   tried to access inexistent entry in dat.\n  name in dir:{entry_name}\noffset: 0X{entry.dat_offset.ToString("X")}");
+                Console.WriteLine($"{name}:\n   tried to access inexistent entry in dat.\n   name in dir: {entry_name}\n   offset: 0X{entry.dat_offset.ToString("X")}");
                 return;
             }
             if (data.Length != entry.length)
             {
-                Console.WriteLine($"{name}:\n   <entry {entry_name}|offset 0X{entry.dat_offset.ToString("X")}> length mismatch.\n   dir entry compressed length: 0X{entry.length.ToString("X")}\n   dat entry compressed length: 0X{data.Length.ToString("X")} ");
+                Console.WriteLine($"{name}:\n   <entry {entry_name}|offset 0X{entry.dat_offset.ToString("X")}> length mismatch.\n   dir entry compressed length: 0X{entry.length.ToString("X")}\n   dat entry compressed length: 0X{data.Length.ToString("X")}");
+                return;
             }
             var widen = new decompressor();
             byte[] decmpr;
@@ -130,10 +134,23 @@ internal class Program
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{name}:\n   error decompressing entry:{entry_name} at offset 0X{entry.dat_offset.ToString("X")}, compressed length: 0X{data.Length.ToString("X")}");
+                Console.WriteLine($"{name}:\n   error decompressing entry:{entry_name} at offset 0X{entry.dat_offset.ToString("X")}\n compressed length: 0X{data.Length.ToString("X")}");
+#if DEBUG
+                Console.WriteLine(e);
+#endif
                 return;
             }
-            await File.WriteAllBytesAsync(Path.Combine(name, entry_name), decmpr);
+            try
+            {
+                await File.WriteAllBytesAsync(Path.Combine(name, entry_name), decmpr);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"{name}:\n   error creating file from entry:{entry_name} at offset 0X{entry.dat_offset.ToString("X")}\n decompressed length: 0X{decmpr.Length.ToString("X")}");
+#if DEBUG
+                Console.WriteLine(e);
+#endif
+            }
         }
     }
 }

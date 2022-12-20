@@ -9,8 +9,7 @@
         {
             public static readonly byte[] magic = { 0x4c, 0x42, 0x20, 0x44, 0x41, 0x54, 0x1a, 0x00 }; // ["LB DAT", 0x1a, 0x00]
             public ulong entries_num { get; private set; }
-            public uint[] entry_offsets { get; private set; }
-            public static readonly byte[] end_of_header = { 0x00, 0x00, 0x00, 0x00 };
+            public uint[] entry_boundaries { get; private set; }
 
             public string Parse(BinaryReader br)
             {
@@ -20,17 +19,12 @@
                     return "bad signature";
                 }
                 entries_num = br.ReadUInt64();
-                entry_offsets = new uint[entries_num];
-                for (ulong i = 0; i < entries_num; i++)
+                entry_boundaries = new uint[entries_num + 1];
+                for (ulong i = 0; i < entries_num + 1; i++)
                 {
-                    entry_offsets[i] = br.ReadUInt32();
+                    entry_boundaries[i] = br.ReadUInt32();
                 }
-                byte[] end = br.ReadBytes(end_of_header.Length);
-                if (!end_of_header.SequenceEqual(end))
-                {
-                    return "invalid end of header";
-                }
-                if (br.BaseStream.Position != entry_offsets[0])
+                if (br.BaseStream.Position != entry_boundaries[0])
                 {
                     return "invalid begin of data";
                 }
@@ -48,19 +42,11 @@
 
                 for(ulong i = 0; i < header.entries_num; i++)
                 {
-                    uint offset = header.entry_offsets[i];
-                    long length;
-                    if (i + 1 == header.entries_num - 1) // is this the last entry?
-                    {
-                        length = br.BaseStream.Length - offset;
-                    }
-                    else
-                    {
-                        length = header.entry_offsets[i + 1] - offset;
-                    }
+                    uint offset = header.entry_boundaries[i];
+                    long length = header.entry_boundaries[i + 1] - offset;
                     byte[] data = br.ReadBytes((int)length);
                     entries[offset] = data;
-                    if (header.entry_offsets[i] + length == br.BaseStream.Length) // did we reach the eos?
+                    if (header.entry_boundaries[i] + length == br.BaseStream.Length) // did we reach the eos?
                     {
                         break;
                     }

@@ -1,4 +1,6 @@
-﻿namespace archive_extractor
+﻿using System.Diagnostics;
+
+namespace archive_extractor
 {
     internal class decompressor
     {
@@ -16,6 +18,14 @@
 
             do
             {
+                if(br.BaseStream.Position == br.BaseStream.Length) // algorithm may need correction
+                {
+#if DEBUG
+                    Debugger.Break();
+                    Console.WriteLine("Unexpected end of stream");
+#endif
+                    break;
+                }
                 chunk_length = br.ReadUInt16();
                 
                 if (current_byte == 0)
@@ -49,6 +59,14 @@
 
             while(chunk_length != bytes_read)
             {
+                if (br.BaseStream.Position == br.BaseStream.Length) // algorithm may need correction
+                {
+#if DEBUG
+                    Debugger.Break();
+                    Console.WriteLine("Unexpected end of stream");
+#endif
+                    break;
+                }
                 byte subChunkType = br.ReadByte();
                 bytes_read++;
 
@@ -60,12 +78,12 @@
                     offset_from_end = (subChunkType & 0B00011111) << 8 | br.ReadByte();
                     bytes_read++;
                     AppendFromOutputBacklog(bw, num + 4, offset_from_end);
-                }/*
+                }
                 else if((subChunkType & 0B01000000) != 0 && (subChunkType & 0B00100000) != 0) // case: 0B011N_NNNN
                 {
                     num = subChunkType & 0B00011111; // low 5 bits
                     AppendFromOutputBacklog(bw, num, offset_from_end);
-                }*/
+                }
                 else if((subChunkType & 0B01000000) != 0) // case: 0B010X_NNNN
                 {
                     num = subChunkType & 0B00001111; // low 4 bits
@@ -123,6 +141,14 @@
 
             while(true)
             {
+                if (br.BaseStream.Position == br.BaseStream.Length) // algorithm may need correction
+                {
+#if DEBUG
+                    Debugger.Break();
+                    Console.WriteLine("Unexpected end of stream");
+#endif
+                    break;
+                }
                 if (!ReadBitFlag())
                     bw.Write(br.ReadByte());
                 else if (!ReadBitFlag())
@@ -149,8 +175,17 @@
             //Go back "offset_from_end" bytes in the output stream, and copy the first "num_bytes" bytes from that position to the end of the buffer
             for (int i = 0; i < num_bytes; i++)
             {
-                byte byteToCopy = (bw.BaseStream as MemoryStream).GetBuffer()[bw.BaseStream.Position - offset_from_end];
-                bw.Write(byteToCopy); // stream position is advanced automatically
+                try
+                {
+                    byte byteToCopy = (bw.BaseStream as MemoryStream).GetBuffer()[bw.BaseStream.Position - offset_from_end];
+                    bw.Write(byteToCopy); // stream position is advanced automatically
+                }
+                catch(Exception e)
+                {
+                    Debugger.Break();
+                    Console.WriteLine(e);
+                    break;
+                }
             }
         }
     }
