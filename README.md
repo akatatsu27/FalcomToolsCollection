@@ -1,2 +1,2 @@
-# Falcom_Data_Formats
-a collection of kaitai-struct definitions, and json converters, of various falcom data formats
+# FalcomToolsCollection
+a collection of kaitai-struct definitions, to/from json converters, and compression algorithms for various falcom data formats
