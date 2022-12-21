@@ -7,6 +7,9 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
+#if false
+        await ExtractArchive("ED6_DT22");
+#else
         if (args.Length == 0)
         {
 
@@ -43,8 +46,8 @@ internal class Program
         {
             await ExtractArchiveMany(args);
         }
-        
-        END:
+#endif
+    END:
         Console.WriteLine("Press enter to close...");
         Console.ReadLine();
     }   
@@ -134,7 +137,7 @@ internal class Program
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{name}:\n   error decompressing entry:{entry_name} at offset 0X{entry.dat_offset.ToString("X")}\n compressed length: 0X{data.Length.ToString("X")}");
+                Console.WriteLine($"{name}:\n   error decompressing entry: {entry_name} at offset 0X{entry.dat_offset.ToString("X")}\n   compressed length: 0X{data.Length.ToString("X")}");
 #if DEBUG
                 Console.WriteLine(e);
 #endif
