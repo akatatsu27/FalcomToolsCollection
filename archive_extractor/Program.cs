@@ -8,7 +8,7 @@ internal class Program
     static async Task Main(string[] args)
     {
 #if false
-        await ExtractArchive("ED6_DT22");
+        await ExtractArchive("ED6_DT33");
 #else
         if (args.Length == 0)
         {
@@ -24,7 +24,7 @@ internal class Program
             Console.WriteLine("1)  [folder]");
             Console.WriteLine("    try to extract all archives in folder");
             Console.WriteLine("2)  [file]...");
-            Console.WriteLine("    try to extract from multiple files");
+            Console.WriteLine("    try to extract from file(s)");
             Console.WriteLine("Press enter to close...");
             Console.ReadLine();
             return;
@@ -131,6 +131,11 @@ internal class Program
             }
             var widen = new decompressor();
             byte[] decmpr;
+            if (entry_name.Contains(".WAV") || entry_name.Contains("._DS"))
+            {
+                decmpr = data;
+                goto NOT_COMPRESSED;
+            }
             try
             {
                 decmpr = await widen.decompress(data);
@@ -143,6 +148,7 @@ internal class Program
 #endif
                 return;
             }
+            NOT_COMPRESSED:
             try
             {
                 await File.WriteAllBytesAsync(Path.Combine(name, entry_name), decmpr);

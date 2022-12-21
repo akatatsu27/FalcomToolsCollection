@@ -163,73 +163,32 @@ namespace archive_extractor
                 int num;
                 if ((subChunkType & 0B10000000) != 0) // case: 0B1NNX_XXXX
                 {
-                    int offset = (subChunkType & 0B00011111) << 8 + input[position++];
-                    num = ((subChunkType & 0B01100000) >> 5) + 4; // NN + 4
-                    if(chunkLength != position)
+                    num = (subChunkType & 0B01100000) >> 5; // get NN
+                    num += 4;
+                    int offset_from_end = (subChunkType & 0B00011111) << 8 | input[position++];
+                    while (position < input.Length && (input[position] & 0xE0) == 0x60)
                     {
-                        byte nextByte = input[position++];
-                        while((nextByte & 0xe0) == 0x60)
+                        num += input[position++] & 0x1F;
+                    }
+                    try
+                    {
+                        for (int i = 0; i < num; i++)
                         {
-                            num += nextByte & 0B00011111;
-                            nextByte = input[position++];
+                            byte byteToCopy = ms.GetBuffer()[bw.BaseStream.Position - offset_from_end];
+                            bw.Write(byteToCopy); // stream position is advanced automatically
                         }
                     }
-                    if(offset < num)
+                    catch
                     {
-                        if(offset < 4)
-                        {
-                            if(num > 0)
-                            {
-                                while(num-- != 0)
-                                {
-                                    byte byteToCopy = ms.GetBuffer()[ms.Position - offset];
-                                    bw.Write(byteToCopy);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = (int)((num >> 0x1f & 0xfU) + num) >> 4; 0 < i; i--)
-                            {
-                                uint uintToCopy = ms.GetBuffer().ReadU32(ms.Position - offset);
-                                bw.Write(uintToCopy);
-                                uintToCopy = ms.GetBuffer().ReadU32(ms.Position - offset + 4);
-                                bw.Write(uintToCopy);
-                                uintToCopy = ms.GetBuffer().ReadU32(ms.Position - offset + 8);
-                                bw.Write(uintToCopy);
-                                uintToCopy = ms.GetBuffer().ReadU32(ms.Position - offset + 12);
-                                bw.Write(uintToCopy);
-                            }
-                            num = (int)(num & 0x8000000f);
-                            if ((int)num < 0)
-                            {
-                                num = (int)(num - 1 | 0xfffffff0) + 1;
-                            }
-                            for (; 0 < (int)num; num = num - 1)
-                            {
-                                byte byteToCopy = ms.GetBuffer()[ms.Position - offset];
-                                bw.Write(byteToCopy);
-                            }
-                        }
+                        Console.WriteLine("Type2 chunk: tried to copy inexistent bytes from previous output");
                     }
-                    else
-                    {
-                        //poor man's memcpy
-                        for(int i = 0; i < num; i++)
-                        {
-                            byte byteToCopy = ms.GetBuffer()[ms.Position - offset];
-                            bw.Write(byteToCopy);
-                        }
-                    }
-                    if (chunkLength == position)
-                        return;
                 }
-                else if((subChunkType & 0B01000000) != 0) // cases: 0B011X_NNNN, 0B010X_NNNN
+                else if ((subChunkType & 0B01000000) != 0) // cases: 0B011X_NNNN, 0B010X_NNNN
                 {
                     byte val = input[position++];
-                    if((subChunkType & 0B00010000) != 0) // if X == 1
+                    if ((subChunkType & 0B00010000) != 0) // if X == 1
                     {
-                        num = val + 4 + (subChunkType & 0B00001111) << 8;
+                        num = val + 4 + ((subChunkType & 0B00001111) << 8);
                         byte val2 = input[position++];
                         for (int i = 0; i < num; i++)
                             bw.Write(val2);
@@ -240,19 +199,7 @@ namespace archive_extractor
                         for (int i = 0; i < num; i++)
                             bw.Write(val);
                     }
-                }/*
-                else if ((subChunkType & 0B01000000) != 0) // case: 0B010X_NNNN
-                {
-                    num = subChunkType & 0B00001111; // low 4 bits
-                    if ((subChunkType & 0B00010000) != 0) // if X == 1
-                    {
-                        num = (num << 8) | input[position++];
-                    }
-                    num += 4;
-                    byte next_byte = input[position++];
-                    for (int i = 0; i < num; i++) // write the next byte num times
-                        bw.Write(next_byte);
-                }*/
+                }
                 else // case: 0B00XN_NNNN
                 {
                     num = subChunkType & 0B00011111; // low 5 bits
