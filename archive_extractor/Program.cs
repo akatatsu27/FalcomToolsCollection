@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using System.Text;
 using archive_extractor;
-using static archive_extractor.dir_file;
+using Shared;
+using static Shared.dir_file;
 
 internal class Program
 {
@@ -42,7 +43,7 @@ internal class Program
 
             await ExtractArchiveMany(filenames);
         }
-        else // check for individual .dat .dir pairs in args
+        else // check for individual .dat in args
         {
             await ExtractArchiveMany(args);
         }
@@ -115,18 +116,29 @@ internal class Program
         }
         await Task.WhenAll(tasks);
 
+        // Make tab separated file with all the dir entry info
+        string tsv = "file_name\ttimestamp1\ttimestamp2\tdecompressed_size\toriginal_compressed_size\toriginal_dat_offset\n";
+        
+        for (int i = 0; i < dir.entries.Length; i++)
+        {
+            Entry entry = dir.entries[i];
+            tsv += $"{entry.file_name}\t{entry.timestamp1}\t{entry.timestamp2}\t0X{entry.decompressed_size.ToString("X")}\t0X{entry.compressed_size.ToString("X")}\t0X{entry.dat_offset.ToString("X")}\n";
+        }
+        await File.WriteAllTextAsync($"{name}.tsv", tsv);
+
+        // local function
         async Task CreateFile(Entry entry)
         {
             string entry_name = entry.file_name;
-            if (entry_name == "/_______.___" || entry.length == 0) return;
+            if (entry_name == "/_______.___" || entry.compressed_size == 0) return;
             if (!dat.body.entries.TryGetValue(entry.dat_offset, out byte[] data))
             {
                 Console.WriteLine($"{name}:\n   tried to access inexistent entry in dat.\n   name in dir: {entry_name}\n   offset: 0X{entry.dat_offset.ToString("X")}");
                 return;
             }
-            if (data.Length != entry.length)
+            if (data.Length != entry.compressed_size)
             {
-                Console.WriteLine($"{name}:\n   <entry {entry_name}|offset 0X{entry.dat_offset.ToString("X")}> length mismatch.\n   dir entry compressed length: 0X{entry.length.ToString("X")}\n   dat entry compressed length: 0X{data.Length.ToString("X")}");
+                Console.WriteLine($"{name}:\n   <entry {entry_name}|offset 0X{entry.dat_offset.ToString("X")}> length mismatch.\n   dir entry compressed length: 0X{entry.compressed_size.ToString("X")}\n   dat entry compressed length: 0X{data.Length.ToString("X")}");
                 return;
             }
             var widen = new decompressor();
@@ -149,6 +161,10 @@ internal class Program
                 return;
             }
             NOT_COMPRESSED:
+            if(entry.timestamp1 != 0)
+            {
+                Console.WriteLine($"{name}:\n   entry: {entry_name} at offset 0X{entry.dat_offset.ToString("X")}\n   unk1 is 0X{entry.timestamp1.ToString("X")}! :DDDDD");
+            }
             try
             {
                 await File.WriteAllBytesAsync(Path.Combine(name, entry_name), decmpr);

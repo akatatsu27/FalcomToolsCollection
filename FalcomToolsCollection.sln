@@ -6,6 +6,13 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "format_converter", "format_converter\format_converter.csproj", "{AE4AC5BC-6B93-4C73-A57C-75CE7DDBE946}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archive_extractor", "archive_extractor\archive_extractor.csproj", "{20ECD08F-E7D5-4AA4-86C4-FDEEE792DCBE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06} = {AAA818AE-820B-440D-A60D-0F58B51D4C06}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archive_compressor", "archive_compressor\archive_compressor.csproj", "{48DCC47C-C940-425D-8326-B1C5A7CD59FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{AAA818AE-820B-440D-A60D-0F58B51D4C06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +28,14 @@ Global
 		{20ECD08F-E7D5-4AA4-86C4-FDEEE792DCBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20ECD08F-E7D5-4AA4-86C4-FDEEE792DCBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20ECD08F-E7D5-4AA4-86C4-FDEEE792DCBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48DCC47C-C940-425D-8326-B1C5A7CD59FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48DCC47C-C940-425D-8326-B1C5A7CD59FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48DCC47C-C940-425D-8326-B1C5A7CD59FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48DCC47C-C940-425D-8326-B1C5A7CD59FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

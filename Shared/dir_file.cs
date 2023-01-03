@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace archive_extractor
+namespace Shared
 {
-    internal class dir_file
+    public class dir_file
     {
         static readonly byte[] magic = { 0x4c, 0x42, 0x20, 0x44, 0x49, 0x52, 0x1a, 0x00 }; // ["LB DIR", 0x1a, 0x00]
         ulong entries_num;
@@ -11,24 +11,24 @@ namespace archive_extractor
         public class Entry
         {
             public string file_name { get; private set; } // fixed size 12 bytes (not null terminated), encoding: shift-jis
-            uint unk1;
-            public uint length { get; private set; }
-            uint unk3;
-            uint length_copy;
-            uint timestamp;
+            public uint timestamp1 { get; private set; } // almost always null
+            public uint compressed_size { get; private set; }
+            public uint decompressed_size { get; private set; } // 99% of the time. other times it's 2*n*0x2000, or same as compressed_size
+            public uint compressed_size_copy; // literally no idea why
+            public uint timestamp2 { get; private set; }
             public uint dat_offset { get; private set; }
 
             public bool Parse(BinaryReader br)
             {
                 var encoding = Encoding.GetEncoding("shift-jis");
                 file_name = encoding.GetString(br.ReadBytes(12));
-                unk1 = br.ReadUInt32();
-                length = br.ReadUInt32();
-                unk3 = br.ReadUInt32();
-                length_copy = br.ReadUInt32();
-                timestamp = br.ReadUInt32();
+                timestamp1 = br.ReadUInt32();
+                compressed_size = br.ReadUInt32();
+                decompressed_size = br.ReadUInt32();
+                compressed_size_copy = br.ReadUInt32();
+                timestamp2 = br.ReadUInt32();
                 dat_offset = br.ReadUInt32();
-                if(length != length_copy)
+                if(compressed_size != compressed_size_copy)
                 {
                     return false;
                 }

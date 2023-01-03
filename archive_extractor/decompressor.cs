@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
+using archive_extractor;
 
-namespace archive_extractor
+namespace Shared
 {
     /*
      * The compressed byte stream has the following structure:

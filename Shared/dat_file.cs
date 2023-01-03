@@ -1,6 +1,6 @@
-﻿namespace archive_extractor
+﻿namespace Shared
 {
-    internal class dat_file
+    public class dat_file
     {
         Header header;
         public Body body;
