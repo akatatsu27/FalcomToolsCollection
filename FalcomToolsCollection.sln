@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archive_compressor", "archi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{AAA818AE-820B-440D-A60D-0F58B51D4C06}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BTSET1_Converter", "BTSET1_Converter\BTSET1_Converter.csproj", "{D12C88BF-E5BA-4435-A200-694CC20BE789}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BTSET_Converter", "BTSET_Converter\BTSET_Converter.csproj", "{D12C88BF-E5BA-4435-A200-694CC20BE789}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AAA818AE-820B-440D-A60D-0F58B51D4C06} = {AAA818AE-820B-440D-A60D-0F58B51D4C06}
 	EndProjectSection

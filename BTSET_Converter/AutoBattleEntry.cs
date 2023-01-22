@@ -18,7 +18,7 @@ namespace BTSET1_Converter
         [JsonIgnore] public readonly ModelEntry Battlefield;
         [JsonProperty("Battlefield", Required = Required.Always)] public readonly string BattlefieldName;
 
-        internal AutoBattleEntry(ref UInt16 offset, BTSET1 file)
+        internal AutoBattleEntry(ref UInt16 offset, BTSET file)
         {
             Offset = offset;
 

@@ -23,7 +23,7 @@ namespace BTSET1_Converter
         [JsonProperty(Required = Required.Always)] public readonly string BattlefieldName;
         [JsonProperty("VariationWeights", Required = Required.Always)] public int[] JsonBytes;
 
-        internal BattleEntry(ref UInt16 offset, BTSET1 file, bool canBeEmpty)
+        internal BattleEntry(ref UInt16 offset, BTSET file, bool canBeEmpty)
         {
             Offset = offset;
 

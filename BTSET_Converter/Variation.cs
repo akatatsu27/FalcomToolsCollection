@@ -22,7 +22,7 @@ namespace BTSET1_Converter
         [JsonProperty("SurprisePlacements", Required = Required.Always)] public string SurprisePlacementsNames;
         [JsonProperty("Bonuses", Required = Required.Always)] public string BonusesName;
 
-        internal Variation(ref UInt16 offset, BTSET1 file, BattleEntry parent)
+        internal Variation(ref UInt16 offset, BTSET file, BattleEntry parent)
         {
             Offset = offset;
             Parent = parent;

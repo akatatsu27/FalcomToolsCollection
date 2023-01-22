@@ -14,7 +14,7 @@ namespace BTSET1_Converter
         List<Battle> UsedByList = new();
         [JsonIgnore] internal UInt16 Offset;
 
-        internal ModelEntry(ref UInt16 offset, BTSET1 file)
+        internal ModelEntry(ref UInt16 offset, BTSET file)
         {
             Offset = offset;
 

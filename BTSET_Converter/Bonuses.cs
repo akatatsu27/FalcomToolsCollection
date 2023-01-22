@@ -27,7 +27,7 @@ namespace BTSET1_Converter
         List<Variation> UsedByList = new();
         internal UInt16 Offset;
 
-        internal Bonuses(ref UInt16 offset, BTSET1 file)
+        internal Bonuses(ref UInt16 offset, BTSET file)
         {
             Offset = offset;
 

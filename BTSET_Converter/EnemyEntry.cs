@@ -11,7 +11,7 @@ namespace BTSET1_Converter
         private UInt16 Offset;
         [JsonProperty("DataTable", Required = Required.Always)] public string DataTableName;
 
-        internal EnemyEntry(ref UInt16 offset, BTSET1 file)
+        internal EnemyEntry(ref UInt16 offset, BTSET file)
         {
             Offset = offset;
 

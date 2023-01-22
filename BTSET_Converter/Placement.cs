@@ -12,7 +12,7 @@ namespace BTSET1_Converter
         internal UInt16 Offset;
         List<Variation> UsedByList = new();
 
-        internal Placement(ref UInt16 offset, BTSET1 file)
+        internal Placement(ref UInt16 offset, BTSET file)
         {
             Offset = offset;
 

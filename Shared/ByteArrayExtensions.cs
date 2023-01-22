@@ -1,6 +1,6 @@
 ﻿using System.Buffers.Binary;
 
-namespace archive_extractor
+namespace Shared
 {
     public static class ByteArrayExtensions
     {
