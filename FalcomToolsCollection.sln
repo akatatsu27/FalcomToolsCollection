@@ -10,9 +10,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archive_extractor", "archiv
 		{AAA818AE-820B-440D-A60D-0F58B51D4C06} = {AAA818AE-820B-440D-A60D-0F58B51D4C06}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archive_compressor", "archive_compressor\archive_compressor.csproj", "{48DCC47C-C940-425D-8326-B1C5A7CD59FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archive_compressor", "archive_compressor\archive_compressor.csproj", "{48DCC47C-C940-425D-8326-B1C5A7CD59FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{AAA818AE-820B-440D-A60D-0F58B51D4C06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{AAA818AE-820B-440D-A60D-0F58B51D4C06}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BTSET1_Converter", "BTSET1_Converter\BTSET1_Converter.csproj", "{D12C88BF-E5BA-4435-A200-694CC20BE789}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AAA818AE-820B-440D-A60D-0F58B51D4C06} = {AAA818AE-820B-440D-A60D-0F58B51D4C06}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +41,10 @@ Global
 		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAA818AE-820B-440D-A60D-0F58B51D4C06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D12C88BF-E5BA-4435-A200-694CC20BE789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D12C88BF-E5BA-4435-A200-694CC20BE789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D12C88BF-E5BA-4435-A200-694CC20BE789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D12C88BF-E5BA-4435-A200-694CC20BE789}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
