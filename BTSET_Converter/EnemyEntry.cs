@@ -1,32 +1,31 @@
 ﻿using Newtonsoft.Json;
 
-namespace BTSET1_Converter
+namespace BTSET_Converter;
+
+internal class EnemyEntry
 {
-    internal class EnemyEntry
+    [JsonProperty(Required = Required.Always)] public readonly UInt16 Index;
+    [JsonIgnore] internal UInt16 DataTable;
+
+    //Metadata
+    private UInt16 Offset;
+    [JsonProperty("DataTable", Required = Required.Always)] public string DataTableName;
+
+    internal EnemyEntry(ref UInt16 offset, BTSET file)
     {
-        [JsonProperty(Required = Required.Always)] public readonly UInt16 Index;
-        [JsonIgnore] internal UInt16 DataTable;
+        Offset = offset;
 
-        //Metadata
-        private UInt16 Offset;
-        [JsonProperty("DataTable", Required = Required.Always)] public string DataTableName;
+        Index = file.ReadUInt16(ref offset);
+        DataTable = file.ReadUInt16(ref offset);
 
-        internal EnemyEntry(ref UInt16 offset, BTSET file)
-        {
-            Offset = offset;
+        DataTableName = $"ED6_DT{DataTable.ToString("X")}";
+    }
 
-            Index = file.ReadUInt16(ref offset);
-            DataTable = file.ReadUInt16(ref offset);
+    //For Newtonsoft only
+    public EnemyEntry() { }
 
-            DataTableName = $"ED6_DT{DataTable.ToString("X")}";
-        }
-
-        //For Newtonsoft only
-        public EnemyEntry() { }
-
-        internal byte[] ToByteArray()
-        {
-            return BitConverter.GetBytes(Index).Concat(BitConverter.GetBytes(DataTable)).ToArray();
-        }
+    internal byte[] ToByteArray()
+    {
+        return BitConverter.GetBytes(Index).Concat(BitConverter.GetBytes(DataTable)).ToArray();
     }
 }

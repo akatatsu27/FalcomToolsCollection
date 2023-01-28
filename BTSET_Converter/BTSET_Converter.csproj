@@ -5,6 +5,23 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;BTSET_Converter_THIRD;BTSET_CONVERTER_SC</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BTSET_Converter_THIRD|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;THIRD;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BTSET_CONVERTER_SC|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;SC;DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
