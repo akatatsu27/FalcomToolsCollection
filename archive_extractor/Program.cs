@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Text;
-using archive_extractor;
 using Shared;
 using static Shared.dir_file;
 
+namespace archive_extractor;
 internal class Program
 {
     static async Task Main(string[] args)

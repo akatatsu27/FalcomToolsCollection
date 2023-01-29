@@ -101,7 +101,7 @@ internal partial class Program
             if (!fNames.Contains(Placements)) missingFiles += $"{Placements}\n";
             if (!fNames.Contains(AutoBattles)) missingFiles += $"{AutoBattles}\n";
 			if (oneOrTwoOrFC == 1 || oneOrTwoOrFC == 2)
-				if (!fNames.Contains(Type2Battles)) missingFiles += $"{Type1Battles}\n";
+				if (!fNames.Contains(Type1Battles)) missingFiles += $"{Type1Battles}\n";
 			if (oneOrTwoOrFC == 1)
                 if (!fNames.Contains(Type2Battles)) missingFiles += $"{Type2Battles}\n";
 			if (oneOrTwoOrFC == 3)

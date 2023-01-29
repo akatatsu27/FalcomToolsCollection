@@ -8,7 +8,7 @@ internal class Variation
     [JsonIgnore] internal UInt16 PlacementTableOffset;
     [JsonIgnore] internal UInt16 SurpriseTableOffset;
     [JsonProperty(Required = Required.Always)] public readonly UInt32 BgmNormal;
-    [JsonProperty(Required = Required.Always)] public readonly UInt32 BgmCritical;
+    [JsonProperty(Required = Required.Always)] public readonly UInt32 Unk28;
     [JsonIgnore] internal UInt32 BonusesOffset;
 
     //Metadata
@@ -32,7 +32,7 @@ internal class Variation
         PlacementTableOffset = file.ReadUInt16(ref offset);
         SurpriseTableOffset = file.ReadUInt16(ref offset);
         BgmNormal = file.ReadUInt32(ref offset);
-        BgmCritical = file.ReadUInt32(ref offset);
+        Unk28 = file.ReadUInt32(ref offset);
         BonusesOffset = file.ReadUInt32(ref offset);
 
 
@@ -55,7 +55,7 @@ internal class Variation
         }
 
         return data.Concat(BitConverter.GetBytes(PlacementTableOffset)).Concat(BitConverter.GetBytes(SurpriseTableOffset))
-            .Concat(BitConverter.GetBytes(BgmNormal)).Concat(BitConverter.GetBytes(BgmCritical))
+            .Concat(BitConverter.GetBytes(BgmNormal)).Concat(BitConverter.GetBytes(Unk28))
             .Concat(BitConverter.GetBytes(BonusesOffset)).ToArray();
     }
 }
