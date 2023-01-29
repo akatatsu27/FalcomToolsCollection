@@ -21,7 +21,7 @@ internal class FC_SC_Bonuses : Bonuses
 	[JsonProperty(Required = Required.Always)] public override byte Unk0E { get; protected set; }
 	[JsonProperty(Required = Required.Always)] public override byte Unk0F { get; protected set; }
 
-	internal FC_SC_Bonuses(ref UInt16 offset, BTSET file)
+	internal FC_SC_Bonuses(ref UInt16 offset, BTLSET file)
 	{
 		Offset = offset;
 

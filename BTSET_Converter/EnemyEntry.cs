@@ -11,7 +11,7 @@ internal class EnemyEntry
     private UInt16 Offset;
     [JsonProperty("DataTable", Required = Required.Always)] public string DataTableName;
 
-    internal EnemyEntry(ref UInt16 offset, BTSET file)
+    internal EnemyEntry(ref UInt16 offset, BTLSET file)
     {
         Offset = offset;
 

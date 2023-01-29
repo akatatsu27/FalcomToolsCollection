@@ -19,7 +19,7 @@ internal class BattleEntry : Battle
 	
 	//Metadata
 	internal UInt16 Offset;
-	internal ModelEntry BattlefieldEntry;
+	[JsonIgnore] internal ModelEntry BattlefieldEntry;
 	[JsonProperty(Required = Required.Always)] public readonly string BattlefieldName;
 	[JsonProperty("VariationWeights", Required = Required.Always)] public int[] JsonBytes;
 
@@ -43,45 +43,45 @@ internal class BattleEntry : Battle
 		{
 			if (SCISAHACKYGAME && (Id == 1062))
 			{
-				Variations[0] = new Variation(ref offset, file, this);
+				Variations[0] = new Variation(ref offset, file);
 			}
 			else if (VariationWeights[0] != 0)
 			{
-				Variations[0] = new Variation(ref offset, file, this);
+				Variations[0] = new Variation(ref offset, file);
 			}
 		}
 		else
 		{
-			Variations[0] = new Variation(ref offset, file, this);
+			Variations[0] = new Variation(ref offset, file);
 		}
 
 		if (SCISAHACKYGAME && (Id == 202 || Id == 203 || Id == 204 || Id == 1047 || Id == 1316)) goto SKIP;
 
 		if (SCISAHACKYGAME && Id == 488)
 		{
-			Variations[1] = new Variation(ref offset, file, this);
+			Variations[1] = new Variation(ref offset, file);
 		}
 		else if (VariationWeights[1] != 0)
 		{
-			Variations[1] = new Variation(ref offset, file, this);
+			Variations[1] = new Variation(ref offset, file);
 		}
 
 		if (SCISAHACKYGAME && (Id == 205 ||Id == 488 || Id == 3901))
 		{
-			Variations[2] = new Variation(ref offset, file, this);
+			Variations[2] = new Variation(ref offset, file);
 		}
 		else if (VariationWeights[2] != 0)
 		{
-			Variations[2] = new Variation(ref offset, file, this);
+			Variations[2] = new Variation(ref offset, file);
 		}
 
 		if (SCISAHACKYGAME && (Id == 205))
 		{
-			Variations[3] = new Variation(ref offset, file, this);
+			Variations[3] = new Variation(ref offset, file);
 		}
 		else if (VariationWeights[3] != 0)
 		{
-			Variations[3] = new Variation(ref offset, file, this);
+			Variations[3] = new Variation(ref offset, file);
 		}
 		SKIP:
 		BattlefieldName = BattlefieldEntry.Filename;

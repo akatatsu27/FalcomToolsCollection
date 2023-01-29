@@ -14,7 +14,7 @@ internal class ModelEntry
     List<Battle> UsedByList = new();
     [JsonIgnore] internal UInt16 Offset;
 
-    internal ModelEntry(ref UInt16 offset, BTSET file)
+    internal ModelEntry(ref UInt16 offset, BTLSET file)
     {
         Offset = offset;
 
@@ -31,8 +31,13 @@ internal class ModelEntry
         UsedByList.Add(battleEntry);
         return this;
     }
+	internal ModelEntry AddReference(FC_BattleEntry battleEntry)
+	{
+		//UsedByList.Add(battleEntry);
+		return this;
+	}
 
-    internal byte[] ToByteArray()
+	internal byte[] ToByteArray()
     {
         byte[] data = BitConverter.GetBytes(Unk00).Concat(BitConverter.GetBytes(NameOffset)).Concat(Encoding.ASCII.GetBytes(Filename)).Append<byte>(0).ToArray();
         return data;

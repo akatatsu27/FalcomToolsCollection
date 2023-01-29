@@ -10,14 +10,11 @@ internal class BTSET2 : BTSET
     internal UInt16 AutoBattleEntryTableOffset;
     internal override Dictionary<UInt16, Bonuses> BonusesTable { get; set; } = new();
     internal override Dictionary<UInt16, ModelEntry> ModelTable { get; set; } = new();
-    internal override Dictionary<UInt16, Placement[]> PlacementTable { get; set; } = new(); //84 sets of 8 placements
+    internal override Dictionary<UInt16, Placement[]> PlacementTable { get; set; } = new();
     private List<UInt16> BattleEntryOffsets = new();
     private List<UInt16> AutoBattleEntryOffsets = new();
     internal override Dictionary<UInt16, BattleEntry> Type1Battles { get; set; } = new();
-	internal readonly Dictionary<UInt16, AutoBattleEntry> AutoBattles = new();
-    protected override byte[]? Data { get; set; }
-    protected override bool[]? Coverage { get; set; } // set to true if the byte has been read at least once. If all true => full coverage
-    private bool IsFullCoverage => Coverage.All(w => w == true);
+	internal override Dictionary<UInt16, AutoBattleEntry> AutoBattles { get; set; } = new();
 
 	//Unfortunately the below information isn't encoded anywhere
 	private const ushort SC_BT_OFFSETS_NUM = 29;

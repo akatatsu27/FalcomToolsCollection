@@ -18,7 +18,7 @@ internal class AutoBattleEntry : Battle
     [JsonIgnore] public readonly ModelEntry Battlefield;
     [JsonProperty("Battlefield", Required = Required.Always)] public readonly string BattlefieldName;
 
-    internal AutoBattleEntry(ref UInt16 offset, BTSET file)
+    internal AutoBattleEntry(ref UInt16 offset, BTLSET file)
     {
         Offset = offset;
 

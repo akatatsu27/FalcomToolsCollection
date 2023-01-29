@@ -12,7 +12,7 @@ internal class Placement
     internal UInt16 Offset;
     List<Variation> UsedByList = new();
 
-    internal Placement(ref UInt16 offset, BTSET file)
+    internal Placement(ref UInt16 offset, BTLSET file)
     {
         Offset = offset;
 

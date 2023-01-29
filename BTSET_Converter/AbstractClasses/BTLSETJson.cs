@@ -1,20 +1,19 @@
-﻿using System.Xml.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BTSET_Converter;
 
-internal abstract class BTSETJson
+internal abstract class BTLSETJson
 {
-	public virtual Dictionary<string, Bonuses> BonusesTable { get; set; }
-	public virtual Dictionary<string, ModelEntry> ModelTable { get; set; }
-	public virtual Dictionary<string, Placement[]> PlacementTable { get; set; }
-	public virtual Dictionary<string, BattleEntry> Type1Battles { get; set; }
-	public virtual Dictionary<string, AutoBattleEntry> AutoBattles { get; set; }
+	public abstract Dictionary<string, Bonuses> BonusesTable { get; set; }
+	public abstract Dictionary<string, ModelEntry> ModelTable { get; set; }
+	public abstract Dictionary<string, Placement[]> PlacementTable { get; set; }
+	public abstract Dictionary<string, AutoBattleEntry> AutoBattles { get; set; }
 
 	//For Serialization
 	[JsonIgnore] protected readonly Dictionary<UInt16, string> OffsetToNameMap = new();
 	//For Deserialization
 	[JsonIgnore] protected readonly Dictionary<string, UInt16> NameToOffsetMap = new();
+
 	protected void CalculateBonusesOffsets(ref UInt16 curOffset)
 	{
 		foreach (var bonuses in BonusesTable)
@@ -60,42 +59,12 @@ internal abstract class BTSETJson
 			curOffset += (1 + 1 + 2) * 8; // (sizeof(X) + sizeof(Y) + sizeof(Rot)) * 8 placements
 		}
 	}
-	protected void CalculateType1BattleOffsetsPart1(ref UInt16 curOffset)
-	{
-		foreach (var battle in Type1Battles)
-		{
-			string name = battle.Key;
-			BattleEntry entry = battle.Value;
-			entry.FieldOffset = NameToOffsetMap[entry.BattlefieldName];
-			foreach (var variation in entry.Variations)
-			{
-				if (variation == null) continue;
-				variation.BonusesOffset = NameToOffsetMap[variation.BonusesName];
-				variation.PlacementTableOffset = NameToOffsetMap[variation.PlacementsNames];
-				variation.SurpriseTableOffset = NameToOffsetMap[variation.SurprisePlacementsNames];
-			}
-#if DEBUG && THIRD
-			if (GetType() == typeof(BTSET1Json))
-			{
-				//For some reason these battles are not present in the offset table
-				if (battle.Value.Id == 3623 || battle.Value.Id == 529 || battle.Value.Id == 530) continue;
-			}
-#endif
-			curOffset += 2;
-		}
-#if DEBUG && SC
-		// offset 0x15E3 appears twice in a row in SC's BTSET2 for some unfathomable reason
-		if(GetType() == typeof(BTSET2Json))
-			curOffset += 2;
-#endif
-	}
 	protected void CalculateAutoBattleOffsetsPart1(ref UInt16 curOffset)
 	{
 		foreach (var battle in AutoBattles)
 		{
 			string name = battle.Key;
 			AutoBattleEntry entry = battle.Value;
-			entry.FieldOffset = NameToOffsetMap[entry.BattlefieldName];
 #if DEBUG && THIRD
 			if (GetType() == typeof(BTSET1Json))
 			{
@@ -104,22 +73,6 @@ internal abstract class BTSETJson
 			}
 #endif
 			curOffset += 2;
-		}
-	}
-	protected void CalculateType1BattleOffsetsPart2(ref UInt16 curOffset)
-	{
-		foreach (var battle in Type1Battles)
-		{
-			string name = battle.Key;
-			BattleEntry entry = battle.Value;
-			entry.Offset = curOffset;
-			curOffset += 16;
-			foreach (var variation in entry.Variations)
-			{
-				if (variation == null) continue;
-				curOffset += 48;
-			}
-
 		}
 	}
 	protected void CalculateAutoBattleOffsetsPart2(ref UInt16 curOffset)
@@ -129,6 +82,7 @@ internal abstract class BTSETJson
 			string name = battle.Key;
 			AutoBattleEntry entry = battle.Value;
 			entry.Offset = curOffset;
+			entry.FieldOffset = NameToOffsetMap[entry.BattlefieldName];
 
 			curOffset += 76; // sizeof(AutoBattleEntry)
 		}
