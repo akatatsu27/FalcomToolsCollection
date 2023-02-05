@@ -1,5 +1,4 @@
-﻿using BTSET_Converter;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BTSET_Converter;
 internal class FC_SC_Bonuses : Bonuses
