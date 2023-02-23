@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Reflection.Emit;
 using Shared;
 
 namespace AS_Converter;
@@ -7,13 +9,89 @@ internal abstract class Instruction
 {
 	protected byte Opcode;
 
+	internal byte[] Serialize()
+	{
+		List<byte> data = new();
+		if(GetType().Name == nameof(AS_8E01_LOAD_X_FILE))
+		{
+			data.Add(0x01);
+		}
+		FieldInfo[] fields = GetType().GetFields();
+		for (byte i = 0; i < fields.Length; i++)
+		{
+			Type fType = fields[i].FieldType;
+			object? value = fields[i].GetValue(this);
+			if (value == null) throw new InvalidDataException($"{GetType().Name}|{fType.Name} wtf why is this empty");
+			if (fType == typeof(byte))
+			{
+				data.Add((byte)value);
+			}
+			else if (fType == typeof(ushort))
+			{
+				ushort val = (ushort)value;
+				data.AddRange(BitConverter.GetBytes(val));
+			}
+			else if (fType == typeof(uint))
+			{
+				uint val = (uint)value;
+				data.AddRange(BitConverter.GetBytes(val));
+			}
+			else if (fType == typeof(string))
+			{
+				string val = (string)value;
+				data.AddRange(val.ToASCII_ByteArrayCString());
+			}
+			else if (fType == typeof(string[]))
+			{
+				string[] val = (string[])value;
+				data.AddRange(val.ToASCII_ByteArrayCString_NullTermArray());
+			}
+			else
+			{
+				throw new NotImplementedException($"How could this happen to me~");
+			}
+		}
+		return data.ToArray();
+	}
+
 	internal static Instruction Parse(BinaryReader br)
 	{
 		byte opcode = br.ReadByte();
-		if (opcode == 0x30 || opcode > 0xB1) throw new InvalidDataException($"Tried to read invalid opcode at offset {br.BaseStream.Position}");
+		if (opcode == 0x8E)
+		{
+			byte nextByte = br.ReadByte();
+			if (nextByte == 0x01)
+			{
+				return new AS_8E01_LOAD_X_FILE() { Opcode = 0x8E, Op1 = br.ReadByte(), Op2 = br.ReadCString() };
+			}
+			else if (nextByte == 0x0D)
+			{
+				return new AS_8E0D () { Opcode = 0x8E, Op1 = nextByte, Op2 = br.ReadByte(), Op3 = br.ReadUInt32(), Op4 = br.ReadUInt32(), Op5 = br.ReadUInt32(), Op6 = br.ReadUInt32(), Op7 = br.ReadUInt32() };
+			}
+			else
+			{
+				if (nextByte == 0x0D || nextByte == 0x0E || nextByte == 0x0F) throw new InvalidDataException($"8E{nextByte.ToString("X2")} isn't a valid opcode");
+				return new AS_8EXX() { Opcode = 0x8E, Op1 = nextByte, Op2 = br.ReadByte(), Op3 = br.ReadUInt32(), Op4 = br.ReadUInt32(), Op5 = br.ReadUInt32(), Op6 = br.ReadUInt32() };
+			}
+		}
+		else if (opcode == 0xA4)
+		{
+			byte nextByte = br.ReadByte();
+			if (nextByte == 0x02)
+			{
+				return new AS_A402() { Op1 = br.ReadUInt16() };
+			}
+			else
+			{
+				if (nextByte == 0x00 || nextByte == 0x01)
+					return new AS_A4() { Op1 = nextByte };
+				else throw new InvalidDataException($"A4{nextByte.ToString("X2")} isn't a valid opcode");
+			}
+		}
+		if (opcode > 0xB1) throw new InvalidDataException($"Tried to read invalid opcode at offset 0x{(br.BaseStream.Position - 1).ToString("X")}");
 		Type instrT = Assembly.GetAssembly(typeof(Instruction)).GetTypes().Where(w => w.Name.StartsWith($"AS_{opcode.ToString("X2")}")).First();
 		object instr = Activator.CreateInstance(instrT);
-		FieldInfo[] fields = instrT.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+		FieldInfo[] fields = instrT.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public);
 		for (byte i = 0; i < fields.Length; i++)
 		{
 			if (fields[i].Name == nameof(Opcode))
@@ -40,13 +118,23 @@ internal abstract class Instruction
 			{
 				val = br.ReadCString();
 			}
+			else if (fType == typeof(string[]))
+			{
+				string[] data = br.ReadASCII_CStringArray();
+				val = data;
+			}
 			else
 			{
 				throw new NotImplementedException($"Parsing Type {fType.Name} is not implemented");
 			}
 			fields[i].SetValue(instr, val);
 		}
-		return instr as Instruction;
+		Instruction inst = instr as Instruction;
+		if (inst.Opcode == 0x50)
+		{
+			if ((inst as AS_50_CALL).Op1 > br.BaseStream.Length) throw new InvalidDataException("Call offset bigger than file size");
+		}
+		return inst;
 	}
 }
 internal class AS_00_END : Instruction { }
@@ -67,7 +155,7 @@ internal class AS_0E_DROP_DOWN : Instruction { byte Op1; uint Op2; uint Op3; uin
 internal class AS_0F_JUMP_TO_TARGET : Instruction { ushort Op1; ushort Op2; }
 internal class AS_10_JUMP_BACK : Instruction { ushort Op1; ushort Op2; }
 internal class AS_11_MOVE : Instruction { byte Op1; byte Op2; uint Op3; uint Op4; uint Op5; uint Op6; byte Op7; }
-internal class AS_12_ADD_EFFECT : Instruction { byte Op1; string Op2; }
+internal class AS_12_ADD_EFFECT : Instruction { ushort Op1; string Op2; }
 internal class AS_13_RELEASE_EFFECT : Instruction { ushort Op1; }
 internal class AS_14 : Instruction { ushort Op1; }
 internal class AS_15_WAIT_EFFECT : Instruction { byte Op1; byte Op2; }
@@ -93,11 +181,11 @@ internal class AS_20 : Instruction { byte Op1; byte Op2; byte Op3; byte Op4; uin
 internal class AS_21 : Instruction { byte Op1; byte Op2; uint Op3; uint Op4; }
 internal class AS_22_BEGIN_THREAD : Instruction { byte Op1; byte Op2; ushort Op3; byte Op4; }
 internal class AS_23_WAIT_THREAD : Instruction { byte Op1; byte Op2; }
-internal class AS_24_SET_CHIP_MODE_FLAG : Instruction { byte Op1; byte Op2; byte Op3; }
+internal class AS_24_SET_CHIP_MODE_FLAG : Instruction { byte Op1; byte Op2; ushort Op3; }
 internal class AS_25_CLEAR_CHIP_MODE_FLAG : Instruction { byte Op1; byte Op2; ushort Op3; }
 internal class AS_26 : Instruction { byte Op1; byte Op2; ushort Op3; }
 internal class AS_27 : Instruction { byte Op1; byte Op2; ushort Op3; }
-internal class AS_28_CHAR_SAY : Instruction { byte Op1; string Op2; ushort Op3; }
+internal class AS_28_CHAR_SAY : Instruction { byte Op1; string Op2; uint Op3; }
 internal class AS_29 : Instruction { byte Op1; }
 internal class AS_2A_TIP_TEXT : Instruction { string Op1; uint Op2; }
 internal class AS_2B : Instruction { /* no operands */ }
@@ -105,7 +193,7 @@ internal class AS_2C_SHADOW_BEGIN : Instruction { byte Op1; ushort Op2; ushort O
 internal class AS_2D_SHADOW_END : Instruction { byte Op1; }
 internal class AS_2E_SHAKE_CHAR : Instruction { byte Op1; uint Op2; uint Op3; uint Op4; }
 internal class AS_2F_SUSPEND_THREAD : Instruction { byte Op1; byte Op2; }
-internal class AS_30 : Instruction { public AS_30() { throw new InvalidDataException(); } }
+internal class AS_30 : Instruction { byte Op1; string[] Op2; }
 internal class AS_31 : Instruction { byte Op1; uint Op2; }
 internal class AS_32 : Instruction { byte Op1; byte Op2; }
 internal class AS_33 : Instruction { byte Op1; byte Op2; }
@@ -119,7 +207,7 @@ internal class AS_3A_TILT_ANGLE : Instruction { uint Op1; uint Op2; }
 internal class AS_3B_ROTATION_ANGLE_H : Instruction { uint Op1; uint Op2; }
 internal class AS_3C : Instruction { ushort Op1; uint Op2; }
 internal class AS_3D_SHAKE_SCREEN : Instruction { uint Op1; uint Op2; uint Op3; uint Op4; }
-internal class AS_3E : Instruction { ushort Op1; uint Op2; }
+internal class AS_3E : Instruction { uint Op1; uint Op2; }
 internal class AS_3F : Instruction { byte Op1; }
 internal class AS_40 : Instruction { byte Op1; }
 internal class AS_41_LOCK_ANGLE : Instruction { byte Op1; }
@@ -137,7 +225,7 @@ internal class AS_4C_LOOP_TARGET_BEG : Instruction { ushort Op1; }
 internal class AS_4D_RESET_LOOP_TARGET : Instruction { /* no operands */ }
 internal class AS_4E_LOOP_TARGET_END : Instruction { /* no operands */ }
 internal class AS_4F : Instruction { byte Op1; byte Op2; }
-internal class AS_50_CALL : Instruction { ushort Op1; }
+internal class AS_50_CALL : Instruction { public ushort Op1; }
 internal class AS_51_RET : Instruction { /* no operands */ }
 internal class AS_52 : Instruction { byte Op1; }
 internal class AS_53 : Instruction { byte Op1; }
@@ -190,7 +278,7 @@ internal class AS_81 : Instruction { byte Op1; byte Op2; ushort Op3; }
 internal class AS_82 : Instruction { /* no operands */ }
 internal class AS_83_SORT_TARGET : Instruction { byte Op1; }
 internal class AS_84_ROTATE_CHAR : Instruction { byte Op1; ushort Op2; ushort Op3; ushort Op4; uint Op5; byte Op6; }
-internal class AS_85 : Instruction { byte Op1; ushort Op2; uint Op3; }
+internal class AS_85 : Instruction { byte Op1; byte Op2; uint Op3; }
 internal class AS_86 : Instruction { ushort Op1; ushort Op2; ushort Op3; byte Op4; uint Op5; }
 internal class AS_87 : Instruction { ushort Op1; byte Op2; }
 internal class AS_88_VOICE : Instruction { ushort Op1; }
@@ -199,7 +287,9 @@ internal class AS_8A_CLONE : Instruction { byte Op1; byte Op2; }
 internal class AS_8B_USE_ITEM_BEGIN : Instruction { /* no operands */ }
 internal class AS_8C_USE_ITEM_END : Instruction { /* no operands */ }
 internal class AS_8D_ZOOM : Instruction { byte Op1; uint Op2; uint Op3; uint Op4; uint Op5; }
-internal class AS_8E_LOAD_X_FILE : Instruction { public AS_8E_LOAD_X_FILE() { throw new NotImplementedException(); } } //TODO
+internal class AS_8E01_LOAD_X_FILE : Instruction { public byte Op1; public string Op2; } //8E01 is a two-byte opcode, the 0x01 after the 0x8E won't be counted as an operand
+internal class AS_8E0D : Instruction { public byte Op1; public byte Op2; public uint Op3; public uint Op4; public uint Op5; public uint Op6; public uint Op7; }
+internal class AS_8EXX : Instruction { public byte Op1; public byte Op2; public uint Op3; public uint Op4; public uint Op5; public uint Op6; } // 1-byte 0x8E is the opcode
 internal class AS_8F : Instruction { byte Op1; }
 internal class AS_90 : Instruction { byte Op1; }
 internal class AS_91 : Instruction { byte Op1; }
@@ -208,7 +298,7 @@ internal class AS_93 : Instruction { byte Op1; byte Op2; string Op3; }
 internal class AS_94 : Instruction { byte Op1; string Op2; uint Op3; }
 internal class AS_95 : Instruction { /* no operands */ }
 internal class AS_96_SET_ANGLE_TARGET : Instruction { byte Op1; string Op2; ushort Op3; }
-internal class AS_97_MOVE_ANGLE : Instruction { uint Op1; uint Op2; ushort Op3; }
+internal class AS_97_MOVE_ANGLE : Instruction { uint Op1; ushort Op2; ushort Op3; }
 internal class AS_98 : Instruction { byte Op1; byte Op2; uint Op3; uint Op4; }
 internal class AS_99 : Instruction { byte Op1; }
 internal class AS_9A : Instruction { uint Op1; }
@@ -221,7 +311,8 @@ internal class AS_A0 : Instruction { byte Op1; uint Op2; ushort Op3; string Op4;
 internal class AS_A1 : Instruction { byte Op1; uint Op2; }
 internal class AS_A2 : Instruction { byte Op1; }
 internal class AS_A3 : Instruction { byte Op1; byte Op2; }
-internal class AS_A4 : Instruction { public AS_A4() { throw new NotImplementedException(); } } //TODO
+internal class AS_A4 : Instruction { public byte Op1; }
+internal class AS_A402 : Instruction { public ushort Op1; } // The first byte is part of the 2-byte Opcode
 internal class AS_A5 : Instruction { byte Op1; byte Op2; uint Op3; uint Op4; byte Op5; }
 internal class AS_A6 : Instruction { byte Op1; byte Op2; byte Op3; uint Op4; uint Op5; uint Op6; uint Op7; }
 internal class AS_A7_BATTLE_EFFECT_END : Instruction { byte Op1; ushort Op2; }

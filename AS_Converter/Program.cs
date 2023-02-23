@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace AS_Converter;
 
@@ -7,9 +8,15 @@ internal partial class Program
 	static async Task Main(string[] args)
 	{
 #if DEBUG
-		byte[] data = await File.ReadAllBytesAsync("AS32400 ._DT");
-		AS_Third file = AS_Third.Read(data);
-		bool foo = true;
+		List<AS_Third> scripts = new();
+		foreach (string file in Directory.GetFiles("DT30"))
+		{
+			byte[] data = await File.ReadAllBytesAsync(file);
+			AS_Third script = AS_Third.ReadBinary(data);
+			scripts.Add(script);
+			if (file.Contains("AS00100 ._DT"))
+				Debugger.Break();
+		}
 #else
 		if (args.Length == 0)
 		{

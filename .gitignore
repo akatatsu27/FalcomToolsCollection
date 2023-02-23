@@ -5,3 +5,8 @@ Generated/
 ED6_DT30/
 MSDT/
 MSJson/
+*.exe
+
+AS_ConverterPlusPlus/DT30/
+AS_ConverterPlusPlus/out/
+*.pdb

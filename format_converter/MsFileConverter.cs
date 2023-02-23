@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Kaitai;
 using Newtonsoft.Json;
+using Shared;
 
 namespace format_converter
 {
@@ -160,7 +161,7 @@ namespace Kaitai
         }
         public byte[] ToByteArray()
         {
-            BinaryWriter bw = new(new MemoryStream(), Encoding.GetEncoding("shift-jis"));
+            using BinaryWriter bw = new(new MemoryStream());
             bw.Write(Condition);
             bw.Write(Probability);
             bw.Write(Target);
@@ -170,7 +171,6 @@ namespace Kaitai
             bw.Write(SkillInfoIndex);
             bw.Write(Unknown.ToArray());
             byte[] asBytes = (bw.BaseStream as MemoryStream).ToArray();
-            bw.Close();
             return asBytes;
         }
     }
@@ -185,15 +185,11 @@ namespace Kaitai
         }
         public byte[] ToByteArray()
         {
-            var encoding = Encoding.GetEncoding("shift-jis");
-            BinaryWriter bw = new(new MemoryStream(), encoding);
+            using BinaryWriter bw = new(new MemoryStream());
             bw.Write(Data.ToArray());
-            bw.Write(encoding.GetBytes(SkillName));
-            bw.Write((byte)0);
-            bw.Write(encoding.GetBytes(SkillDescription));
-            bw.Write((byte)0);
+            bw.Write(SkillName.ToSHIFTJIS_CString());
+            bw.Write(SkillDescription.ToSHIFTJIS_CString());
             byte[] asBytes = (bw.BaseStream as MemoryStream).ToArray();
-            bw.Close();
             return asBytes;
         }
     }

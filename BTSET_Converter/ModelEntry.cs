@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Shared;
 
 namespace BTSET_Converter;
 
@@ -39,7 +38,7 @@ internal class ModelEntry
 
 	internal byte[] ToByteArray()
     {
-        byte[] data = BitConverter.GetBytes(Unk00).Concat(BitConverter.GetBytes(NameOffset)).Concat(Encoding.ASCII.GetBytes(Filename)).Append<byte>(0).ToArray();
+        byte[] data = BitConverter.GetBytes(Unk00).Concat(BitConverter.GetBytes(NameOffset)).Concat(Filename.ToASCII_ByteArrayCString()).ToArray();
         return data;
     }
 }
