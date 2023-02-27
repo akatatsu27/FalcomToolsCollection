@@ -8,52 +8,58 @@ struct context
 {
 private:
     bool _isGood;
-    size_t _position;
     size_t _size;
-    char* bufferStart;
     char* buffer;
     
 public:
 
+    size_t position;
     std::filesystem::path filename;
     inline bool isGood() { return _isGood; }
-    inline size_t position(){ return _position; }
     inline size_t size() { return _size; }
+    inline char at(size_t pos)
+    {
+        if(pos > _size -1) throw(69);
+        return buffer[pos];
+    }
     inline char u8() 
     { 
-        char byte = *(char*)buffer;
-        buffer += 1;
-        _position += 1; 
+        if(position >= _size) throw (69);
+        char byte = *(char*)(buffer + position);
+        position += 1; 
         return byte;   
     }
     inline uint16 u16() 
     {
-        uint16 val = *(uint16*)buffer;
-        buffer += 2;
-        _position += 2; 
+        if(position >= _size -1)
+            throw (69);
+        uint16 val = *(uint16*)(buffer + position);
+        position += 2; 
         return val;   
     }
     inline uint32 u32() 
     {
-        uint32 val = *(uint32*)buffer;
-        buffer += 4;
-        _position += 4; 
+        if(position >= _size -3) throw (69);
+        uint32 val = *(uint32*)(buffer + position);
+        position += 4; 
         return val;   
     }
-    inline string cstring()
+    inline char* cstring()
     {
-        string str(buffer);
-        size_t size = str.size();
-        buffer += size + 1;
-        _position += size + 1;
+        char* str = (buffer + position);
+        char curByte;
+        do
+        {
+            curByte = u8();
+        } while(curByte);
         return str;
     }
-    inline void cstring_array(vector<string>* arr)
+    inline void cstring_array(vector<char*>* arr)
     {
         do
         {
-            string str = cstring();
-            if(str == "\0")
+            char* str = cstring();
+            if(*str == 0)
             {
                 return;
             }
@@ -70,10 +76,9 @@ public:
             _isGood = false;
             return;
         }
-        _position = 0;
+        position = 0;
         _size = fSize;
-        bufferStart = new char[fSize];
-        buffer = bufferStart;
+        buffer = new char[fSize];
 	    try
 	    {
 		    file.read(buffer, fSize);
@@ -88,6 +93,6 @@ public:
     }
     ~context()
     {
-        delete[] bufferStart;
+        delete[] buffer;
     }
 };

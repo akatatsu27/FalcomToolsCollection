@@ -4,8 +4,41 @@
 #include <filesystem>
 #include "aniscript.h"
 
-bool ParseBinary(const std::filesystem::path* fPath);
+bool ParseBinary(const std::filesystem::path *fPath)
+{
+	namespace fs = std::filesystem;
+	context ctx(fPath);
+	if (!ctx.isGood())
+		return false;
+	aniscript as;
+	std::string text;
+	try
+	{
+		if (!as.ParseFromBinary(&ctx, &text))
+			return false;
+	}
+	catch (...)
+	{
+		//printf(text.data());
+		printf("%ls:\ntried to read outside the bounds of the file\n", fPath->c_str());
+	}
 
+	fs::path folder("out");
+	std::filesystem::path filename = ctx.filename;
+	fs::path extension(".as");
+	filename.replace_extension(extension);
+	folder /= filename;
+	std::ofstream txtfile;
+	txtfile.open(folder, ios::out | ios::trunc);
+	if (!txtfile.is_open())
+	{
+		printf("unable to write in this directory");
+		return false;
+	}
+	txtfile.write(text.data(), text.size());
+	txtfile.close();
+	return true;
+}
 int main(int argc, char** argv)
 {
     std::filesystem::path folder("out");

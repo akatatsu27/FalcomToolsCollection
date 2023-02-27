@@ -65,6 +65,9 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "codecvt": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "map": "cpp",
+        "xtree": "cpp",
+        "array": "cpp"
     }
 }
