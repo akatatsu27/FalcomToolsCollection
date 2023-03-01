@@ -1,7 +1,6 @@
 #include "as_instruction.h"
-#include "context.h"
 
-instruction instruction::first_pass(context *const ctx)
+instruction instruction::first_pass_binary(binary_context *const ctx)
 {
 #define b ctx->u8()
 #define s ctx->u16()

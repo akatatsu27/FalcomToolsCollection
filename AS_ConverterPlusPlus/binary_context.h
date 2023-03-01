@@ -1,10 +1,7 @@
 #include "directives.h"
-#include <fstream>
-#include <filesystem>
-#include <iostream>
 #pragma once
 
-struct context
+struct binary_context
 {
 private:
     bool _isGood;
@@ -17,11 +14,6 @@ public:
     std::filesystem::path filename;
     inline bool isGood() { return _isGood; }
     inline size_t size() { return _size; }
-    inline char at(size_t pos)
-    {
-        if(pos > _size -1) throw(69);
-        return buffer[pos];
-    }
     inline char u8() 
     { 
         if(position >= _size) throw (69);
@@ -66,7 +58,7 @@ public:
             arr->push_back(str);
         } while (1);
     }
-    context(const std::filesystem::path* fPath)
+    binary_context(const std::filesystem::path* const fPath)
     {
         uintmax_t fSize = std::filesystem::file_size(*fPath);
 	    std::ifstream file(*fPath, std::ios::binary);
@@ -91,7 +83,7 @@ public:
             _isGood = false;
 	    }
     }
-    ~context()
+    ~binary_context()
     {
         delete[] buffer;
     }

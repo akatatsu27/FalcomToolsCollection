@@ -1,7 +1,6 @@
-#include "directives.h"
 #include "aniscript.h"
 
-bool aniscript::ParseFromBinary(context *const ctx, string *text)
+bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 {
 	craft_offset_table_offset = ctx->u16();
 	craft_offset_table_offset_end = ctx->u16();
@@ -68,7 +67,7 @@ bool aniscript::ParseFromBinary(context *const ctx, string *text)
 		instruction instr;
 		try
 		{
-			instr = instruction::first_pass(ctx);
+			instr = instruction::first_pass_binary(ctx);
 		}
 		catch(...)
 		{
@@ -127,10 +126,15 @@ bool aniscript::ParseFromBinary(context *const ctx, string *text)
 				text->append(":\n");
 			}
 		}
-		it->second.second_pass(ctx, text);
+		it->second.second_pass_binary(ctx, text);
 		++it;
 	}
 	static std::regex longform("\tselect_sub_chip ([a-zA-Z0-9_]+), ([a-zA-Z0-9_]+)\n\tsleep ([a-zA-Z0-9_]+)\n\tupdate");
 	text->assign((string)std::regex_replace(*text, longform, "\tsubchip_update $1, $2, $3"));
 	return true;
+}
+
+bool aniscript::CompileFromText(text_context* const ctx, vector<char>* const binary)
+{
+	return false;
 }

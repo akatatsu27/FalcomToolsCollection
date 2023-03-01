@@ -10,3 +10,6 @@ MSJson/
 AS_ConverterPlusPlus/DT30/
 AS_ConverterPlusPlus/out/
 *.pdb
+
+AS_ConverterPlusPlus/outbin/
+*.pdb

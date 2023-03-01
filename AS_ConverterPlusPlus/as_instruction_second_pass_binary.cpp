@@ -1,7 +1,6 @@
 #include "as_instruction.h"
-#include "context.h"
 
-void instruction::second_pass(context* const ctx, string* const text)
+void instruction::second_pass_binary(binary_context* const ctx, string* const text)
 {
     char buffer[500];
 #define b ctx->u8()
