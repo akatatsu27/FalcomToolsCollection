@@ -134,6 +134,7 @@ private:
                 if(line->find(macroName) != string::npos)
                 {
                     printf("[ERROR] %ls:\n\t detected infinite recursion in macro\n", filename.c_str());
+                    throw(69);
                 }
                 macroLength++;
                 if(line->compare(0, 9, "%endmacro", 0, 9) == 0)
@@ -145,18 +146,21 @@ private:
                 replacedWith.push_back('\n');
             }
             std::regex macro(defined);
-            for(std::list<string>::iterator i = line; i != _lines.end(); i++)
+            std::list<string>::iterator it = line;
+            while(it != _lines.end())
             {
-                if(i->find(macroName) == std::string::npos) continue;
-                std::string str;
-	            std::istringstream ss((string)std::regex_replace(*i, macro, replacedWith));
-                size_t newLineNum = 0;
-                for (; std::getline(ss, str); newLineNum++)
-                {                    
-                    _lines.insert(i, str);
+                if(it->find(macroName) == std::string::npos)
+                {
+                    it++;
+                    continue;
                 }
-                std::list<string>::iterator toBeRemoved = i;
-                while(newLineNum--) {i++;}
+                std::string str;
+	            std::istringstream ss((string)std::regex_replace(*it, macro, replacedWith));
+                while(std::getline(ss, str))
+                {                    
+                    _lines.insert(it, str);
+                }
+                std::list<string>::iterator toBeRemoved = it++;
                 _lines.erase(toBeRemoved);
             }
             
