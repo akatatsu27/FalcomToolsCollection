@@ -1,4 +1,5 @@
-#include "directives.h"
+#include <filesystem>
+#include <fstream>
 #include "aniscript.h"
 
 bool ParseBinary(const std::filesystem::path *fPath)
@@ -42,12 +43,10 @@ bool Preprocess(const std::filesystem::path *fPath)
 	text_context ctx(fPath);
 	if (!ctx.isGood())
 		return false;
-	//aniscript as;
-	//std::string text;
-	//try
-	//{
-	//	if (!as.ParseFromBinary(&ctx, &text))
-	//		return false;
+	aniscript as;
+	std::vector<char> binary;
+	if (!as.CompileFromText(&ctx, &binary))
+		return false;
 	//}
 	//catch (...)
 	//{
@@ -55,7 +54,7 @@ bool Preprocess(const std::filesystem::path *fPath)
 	//	printf("%ls:\n\ttried to read outside the bounds of the file\n", fPath->c_str());
 	//}
 	string text;
-	for(string i : ctx._lines)
+	for(string i : ctx.lines)
 	{
 		text.append(i);
 		text.push_back('\n');
@@ -77,21 +76,36 @@ bool Preprocess(const std::filesystem::path *fPath)
 	return true;
 }
 int main(int argc, char** argv)
-{
+{    
+	using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+	auto t1 = high_resolution_clock::now();
     std::filesystem::path folder("out");
 	std::filesystem::create_directory(folder);
-    const char* fpath = "AS32400 ._DT";
-    //bool succ = ParseBinary("AS32400 ._DT");
     
-    //for( const auto & entry : std::filesystem::directory_iterator( "DT30" ) )
-    //{
-    //    //if(entry.path().filename() == "") { continue; }
-    //    bool succ = ParseBinary(&entry.path());
-    //}
-	for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
+    for( const auto & entry : std::filesystem::directory_iterator( "DT30" ) )
     {
         //if(entry.path().filename() == "") { continue; }
-        bool succ = Preprocess(&entry.path());
+        bool succ = ParseBinary(&entry.path());
     }
+	printf("completed processing binaries\n");
+	//for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
+    //{
+    //    //if(entry.path().filename() == "") { continue; }
+    //    bool succ = Preprocess(&entry.path());
+    //}
+    auto t2 = high_resolution_clock::now();
+
+    /* Getting number of milliseconds as an integer. */
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    /* Getting number of milliseconds as a double. */
+    duration<double, std::milli> ms_double = t2 - t1;
+
+    std::cout << ms_int.count() << "ms\n";
+    std::cout << ms_double.count() << "ms\n";
+
     return EXIT_SUCCESS;
 }

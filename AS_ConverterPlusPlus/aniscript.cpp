@@ -1,140 +1,96 @@
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/regex.hpp>
+#include <unordered_set>
 #include "aniscript.h"
+#include "parse_assembly_line.h"
 
-bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
+bool aniscript::CompileFromText(text_context *const ctx, vector<char> *const binary)
 {
-	craft_offset_table_offset = ctx->u16();
-	craft_offset_table_offset_end = ctx->u16();
-	bones_3d_offset = ctx->u16();
-	chip_entry entry;
-	do
+	bool has_errors = false;
+	char event_funct_count = 0;
+	bool found_event_label[33] = {false};
+	static const boost::regex label_pattern("[ \\t]*([_]*[\\w_]+[_]*)+[ \\t]*:[ \\t]*");
+	static const boost::regex section_pattern("[ \\t]*section[ \\t]+([_]*[\\w]+[_]*)+[ \\t]*:[ \\t]*");
+	boost::smatch what;
+	string label_match;
+	// find total number of event labels, and check for any redefinitions
+	// also find the section definitions
+	size_t line_num = 0;
+	for (std::list<string>::iterator line = ctx->lines.begin(); line != ctx->lines.end(); line_num++, line++)
 	{
-		entry.ch.index = ctx->u16();
-		entry.ch.datatable = ctx->u16();
-		if (entry.ch.index == 0xFFFF)
-			break;
-		entry.cp.index = ctx->u16();
-		entry.cp.datatable = ctx->u16();
-		chip_entries.push_back(entry);
-	} while (1);
-	text->append("%define self 0xFF\n%macro subchip_update 3\nselect_sub_chip $1, $2\nsleep $3\nupdate\n%endmacro\n");
-	text->append("section chip_entries:\n");
-	std::array<char, 100> buffer;
-	for (byte i = 0; i < chip_entries.size(); i++)
-	{
-		chip_entry chp = chip_entries[i];
-		snprintf(buffer.data(), buffer.size(), "chip%d:\nDW 0x%04X, 0x%04X\nDW 0x%04X, 0x%04X\n", i, chp.ch.index, chp.ch.datatable, chp.cp.index, chp.cp.datatable);
-		text->append(&buffer[0]);
-	}
-	text->append("section model_3d:\n");
-	ctx->cstring_array(&model_3d);
-	for (byte i = 0; i < model_3d.size(); i++)
-	{
-		text->append("DB \"");
-		text->append(model_3d[i]);
-		text->append("\", 0x00\n");
-	}
-	text->append("DB 0x00\n"); // array terminator
-	text->append("section bones_3d:\n");
-	if (bones_3d_offset != 0)
-	{
-		bones_3d.fromBuffer(ctx);
-		text->append("DB ");
-		snprintf(buffer.data(), buffer.size(), "0x%04X\n", bones_3d.unk00);
-		text->append(buffer.data());
-		for (char i = 0; i < bones_3d.bones_3d.size(); i++)
-		{
-			text->append("DB \"");
-			text->append(bones_3d.bones_3d[i]);
-			text->append("\"\n");
-		}
-	}
-	do
-	{
-		function_offset_table.push_back(ctx->u16());
-	} while (ctx->position != craft_offset_table_offset_end);
-	text->append("section unk_bytes:\n");
-	for (byte i = 0; i < 8; i++)
-	{
-		unk_bytes[i].unk00 = ctx->u8();
-		unk_bytes[i].unk01 = ctx->u8();
-		snprintf(buffer.data(), buffer.size(), "DB 0x%02X, 0x%02X\n", unk_bytes[i].unk00, unk_bytes[i].unk01);
-		text->append(buffer.data());
-	}
-	size_t beginOfInstructions = ctx->position;
-	text->append("section .text:\n");
-	do
-	{
-		instruction instr;
-		try
-		{
-			instr = instruction::first_pass_binary(ctx);
-		}
-		catch(...)
-		{
-			return false;
-		}	
-		
-		if (instr.opcode == 0xFF)
-			return false;
-		instructions[(uint16)instr.offset] = instr;
-		// combat events trigger specific functions identified by the index
-		// in the function_offset_table
-		// search for the current offset in the function_offset table,
-		// and if it exists place a label
-		for (char i = 0; i < function_offset_table.size(); i++)
-		{
-			if (function_offset_table[i] == instr.offset)
-			{
-				snprintf(&buffer[0], buffer.size(), "FUN%04X", i);
-				labels[(uint16)instr.offset].push_back(buffer);
-			}
-		}
-		
-	} while (ctx->position < ctx->size());
-	if(ctx->position > ctx->size()) return false;
-	// Get an iterator pointing to the first element in the map
-	std::map<uint16, instruction>::iterator it = instructions.begin();
-	// Iterate through the map
-	while (it != instructions.end())
-	{
-		uint16 toff = it->second.targetOffset;
-		if (toff == 0)
-		{
-			++it;
+		size_t label_end_pos = line->find(':');
+		if (label_end_pos == string::npos)
 			continue;
-		}
-
-		instruction func = instructions[toff];
-		if (auto labelV = labels.find(toff); labelV == labels.end()) //labels don't exist. create a new label vector
+		if (boost::regex_match(*line, what, label_pattern))
 		{
-			snprintf(buffer.data(), buffer.size(), "loc%04X", toff);
-			labels[toff].push_back(buffer);	
+			label_match = what[1];
+			new_label(ctx, label_match, event_funct_count, found_event_label);
 		}
-		it->second.labelName = labels[toff][0].data();
-		++it;
+		else if (boost::regex_match(*line, what, section_pattern))
+		{
+			label_match = what[1];
+			new_section(ctx, label_match, line);
+		}
+		else
+		{
+			printf("[ERROR] %ls:%d\n\tmalformed label or section definition\n", ctx->filename.c_str(), line_num);
+			has_errors = true;
+		}
 	}
-	ctx->position = beginOfInstructions;
-	it = instructions.begin();
-	while(it != instructions.end())
+
+	if (!sections.chips)
 	{
-		uint16 instrOffset = it->first;
-		if (auto labelV = labels.find(instrOffset); labelV != labels.end()) //labels exist. place them in the text file before the instruction.
+		printf("[ERROR] %ls:\n\tmissing \"chip_entries\" section\n", ctx->filename.c_str());
+		has_errors = true;
+	}
+	if (!sections.model)
+	{
+		printf("[ERROR] %ls:\n\tmissing \"model_3d\" section\n", ctx->filename.c_str());
+		has_errors = true;
+	}
+	if (!sections.bones)
+	{
+		printf("[ERROR] %ls:\n\tmissing \"bones_3d\" section\n", ctx->filename.c_str());
+		has_errors = true;
+	}
+	if (!sections.unk_bytes)
+	{
+		printf("[ERROR] %ls:\n\tmissing \"unk_bytes\" section\n", ctx->filename.c_str());
+		has_errors = true;
+	}
+	if (!sections.text)
+	{
+		printf("[ERROR] %ls:\n\tmissing \"text\" section\n", ctx->filename.c_str());
+		has_errors = true;
+	}
+
+	if (event_funct_count < 30)
+	{
+		printf("[ERROR] %ls:\n\tmissing mandatory event_function labels:\n", ctx->filename.c_str());
+		for (char i = 0; i < label_names_count; i++)
 		{
-			for (int j = 0; j < labelV->second.size(); j++)
+			if (!found_event_label[i])
 			{
-				text->append(labelV->second[j].data());
-				text->append(":\n");
+				printf("\t%s\n", label_names[i]);
 			}
 		}
-		it->second.second_pass_binary(ctx, text);
-		++it;
+		has_errors = true;
 	}
-	static std::regex longform("\tselect_sub_chip ([a-zA-Z0-9_]+), ([a-zA-Z0-9_]+)\n\tsleep ([a-zA-Z0-9_]+)\n\tupdate");
-	text->assign((string)std::regex_replace(*text, longform, "\tsubchip_update $1, $2, $3"));
-	return true;
-}
+	if (has_errors)
+	{
+		return false;
+	}
+	// calculate offsets
+	size_t cur_offset = 4; // skip craft_offset_table_offset and craft_offset_table_offset_end
+	cur_offset += 2; // bones_3d_offset
+	
+	
 
-bool aniscript::CompileFromText(text_context* const ctx, vector<char>* const binary)
-{
-	return false;
+	has_errors |= validate_chips_section(ctx, cur_offset);
+	has_errors |= validate_model_section(ctx, cur_offset);
+	has_errors |= validate_bones_section(ctx, cur_offset);
+	cur_offset += 2 * event_funct_count;
+	has_errors |= validate_unk_bytes_section(ctx, cur_offset);
+	has_errors |= validate_text_section(ctx, cur_offset);
+	return true;
 }

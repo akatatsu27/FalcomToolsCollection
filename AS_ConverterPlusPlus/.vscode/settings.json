@@ -70,6 +70,15 @@
         "xtree": "cpp",
         "array": "cpp",
         "unordered_map": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "complex": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "functional": "cpp",
+        "set": "cpp",
+        "source_location": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "unordered_set": "cpp"
     }
 }

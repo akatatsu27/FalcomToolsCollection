@@ -2,14 +2,16 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file",
+            "label": "C/C++: g++.exe build AS_Converter",
             "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
                 "-std=c++17",
                 //"-O3",
-                "*.cpp",
+                "aniscript_binary_processing\\*.cpp",
+                "aniscript_text_processing\\*.cpp",
+                "*.cpp",                
                 "-o",
                 "${fileDirname}\\AS_Converter.exe"
             ],
