@@ -1,7 +1,9 @@
+#pragma once
 #include "directives.h"
 #include "binary_context.h"
 #include "text_context.h"
-#pragma once
+
+struct aniscript;
 
 struct instruction
 {
@@ -13,7 +15,7 @@ struct instruction
     std::list<std::string>::iterator line; //the line in the text_context
     uint32 name_hash; //the hash of the instruction's name. used in switch statements
 
-    static instruction first_pass_binary(binary_context *const ctx);
+    static instruction first_pass_binary(binary_context *const ctx, aniscript* const ani);
     static instruction first_pass_text(std::list<string>::iterator &line, char* name, int len, size_t &cur_offset);
     void second_pass_binary(binary_context* const ctx, string* const text);
     void second_pass_text(text_context* const ctx, vector<char>* const binary);
@@ -187,7 +189,7 @@ INSTRUCTION(1+2+2,shadow_begin);
 INSTRUCTION(1,shadow_end);
 INSTRUCTION(1+4+4+4,shake_char);
 INSTRUCTION(1+1,suspend_thread);
-//INSTRUCTION(x,as_30); variable length
+//INSTRUCTION(x,char_say_random); variable length
 INSTRUCTION(1+4,as_31);
 INSTRUCTION(1+1,as_32);
 INSTRUCTION(1+1,as_33);

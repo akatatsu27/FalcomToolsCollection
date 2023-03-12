@@ -2,7 +2,7 @@
 
 void aniscript::new_label(text_context *const ctx, string label_match, char &event_funct_count, bool *const found_event_label)
 {
-	for (char i = 0; i < label_names_count; i++)
+	for (char i = 0; i < TOTAL_EVENT_LABELS; i++)
 	{
 		if (strcmp(label_match.data(), label_names[i]) != 0)
 			continue;

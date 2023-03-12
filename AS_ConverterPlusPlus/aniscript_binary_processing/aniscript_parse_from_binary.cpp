@@ -16,57 +16,27 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 		entry.cp.datatable = ctx->u16();
 		chip_entries.push_back(entry);
 	} while (1);
-	text->append("%define self 0xFF\n%macro subchip_update 3\nselect_sub_chip $1, $2\nsleep $3\nupdate\n%endmacro\n");
-	text->append("section chip_entries:\n");
-	std::array<char, 100> buffer;
-	for (uint8 i = 0; i < chip_entries.size(); i++)
-	{
-		chip_entry chp = chip_entries[i];
-		snprintf(buffer.data(), buffer.size(), "chip%d:\nDW 0x%04X, 0x%04X\nDW 0x%04X, 0x%04X\n", i, chp.ch.index, chp.ch.datatable, chp.cp.index, chp.cp.datatable);
-		text->append(&buffer[0]);
-	}
-	text->append("section model_3d:\n");
 	ctx->cstring_array(&model_3d);
-	for (uint8 i = 0; i < model_3d.size(); i++)
-	{
-		text->append("DB \"");
-		text->append(model_3d[i]);
-		text->append("\"\n");
-	}
-	text->append("section bones_3d:\n");
 	if (bones_3d_offset != 0)
 	{
 		bones_3d.fromBuffer(ctx);
-		text->append("DB ");
-		snprintf(buffer.data(), buffer.size(), "0x%02X\n", bones_3d.unk00);
-		text->append(buffer.data());
-		for (char i = 0; i < bones_3d.bones_3d.size(); i++)
-		{
-			text->append("DB \"");
-			text->append(bones_3d.bones_3d[i]);
-			text->append("\"\n");
-		}
 	}
 	do
 	{
 		function_offset_table.push_back(ctx->u16());
 	} while (ctx->position != craft_offset_table_offset_end);
-	text->append("section unk_bytes:\n");
 	for (uint8 i = 0; i < 8; i++)
 	{
 		unk_bytes[i].unk00 = ctx->u8();
 		unk_bytes[i].unk01 = ctx->u8();
-		snprintf(buffer.data(), buffer.size(), "DB 0x%02X, 0x%02X\n", unk_bytes[i].unk00, unk_bytes[i].unk01);
-		text->append(buffer.data());
 	}
-	size_t beginOfInstructions = ctx->position;
-	text->append("section text:\n");
+	size_t beginOfInstructions = ctx->position;	
 	do
 	{
 		instruction instr;
 		try
 		{
-			instr = instruction::first_pass_binary(ctx);
+			instr = instruction::first_pass_binary(ctx, this);
 		}
 		catch (...)
 		{
@@ -93,6 +63,7 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 	} while (ctx->position < ctx->size());
 	if (ctx->position > ctx->size())
 		return false;
+	std::array<char, 100> buffer;
 	// Get an iterator pointing to the first element in the map
 	std::map<uint16, instruction>::iterator it = instructions.begin();
 	// Iterate through the map
@@ -114,6 +85,49 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 		it->second.labelName = labels[toff][0].data();
 		++it;
 	}
+	//Writing
+	for(auto target_it = targets_in_file.begin(); target_it != targets_in_file.end(); target_it++)
+	{
+		const char* const target_name = instruction::get_target_name(*target_it);
+		snprintf(buffer.data(), buffer.size(), "%%define %s 0x%02X\n", target_name, *target_it);
+		text->append(&buffer[0]);
+	}
+	//text->append("%define self 0xFF\n");
+	text->append("%macro subchip_update 3\nselect_sub_chip $1, $2\nsleep $3\nupdate\n%endmacro\n");
+	text->append("section chip_entries:\n");
+	for (uint8 i = 0; i < chip_entries.size(); i++)
+	{
+		chip_entry chp = chip_entries[i];
+		snprintf(buffer.data(), buffer.size(), "chip%d:\nDW 0x%04X, 0x%04X\nDW 0x%04X, 0x%04X\n", i, chp.ch.index, chp.ch.datatable, chp.cp.index, chp.cp.datatable);
+		text->append(&buffer[0]);
+	}
+	text->append("section model_3d:\n");
+	for (uint8 i = 0; i < model_3d.size(); i++)
+	{
+		text->append("DB \"");
+		text->append(model_3d[i]);
+		text->append("\"\n");
+	}
+	text->append("section bones_3d:\n");
+	if (bones_3d_offset != 0)
+	{
+		text->append("DB ");
+		snprintf(buffer.data(), buffer.size(), "0x%02X\n", bones_3d.unk00);
+		text->append(buffer.data());
+		for (char i = 0; i < bones_3d.bones_3d.size(); i++)
+		{
+			text->append("DB \"");
+			text->append(bones_3d.bones_3d[i]);
+			text->append("\"\n");
+		}
+	}
+	text->append("section unk_bytes:\n");
+	for (uint8 i = 0; i < 8; i++)
+	{
+		snprintf(buffer.data(), buffer.size(), "DB 0x%02X, 0x%02X\n", unk_bytes[i].unk00, unk_bytes[i].unk01);
+		text->append(buffer.data());
+	}
+	text->append("section text:\n");
 	ctx->position = beginOfInstructions;
 	it = instructions.begin();
 	while (it != instructions.end())

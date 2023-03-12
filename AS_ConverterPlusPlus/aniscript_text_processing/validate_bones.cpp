@@ -4,11 +4,13 @@
 
 bool validate_bones_line(std::list<string>::iterator &line, size_t &pos, text_context *ctx)
 {
+	string copy = *line;
     bool has_errors = false;
     char *command_name;
 	char *args[20];
-	size_t cnt = boost::count(*line, ',') + 1;
-	if (!parse_assembly_instruction(line, &command_name, cnt, args)) return true;
+	size_t cnt = boost::count(copy, ',') + 1;
+	if (!parse_assembly_instruction(copy, &command_name, cnt, args))
+		return true;
 
     switch (instruction::hash(command_name))
 	{
@@ -33,11 +35,13 @@ bool validate_bones_line(std::list<string>::iterator &line, size_t &pos, text_co
 }
 bool validate_unk00(std::list<string>::iterator &line, size_t &pos, text_context *ctx)
 {
+	string copy = *line;
     bool has_errors = false;
     char *command_name;
 	char *args[20];
 	size_t cnt = 1;
-	if (!parse_assembly_instruction(line, &command_name, cnt, args)) return true;
+	if (!parse_assembly_instruction(copy, &command_name, cnt, args))
+		return true;
 
     switch (instruction::hash(command_name))
 	{

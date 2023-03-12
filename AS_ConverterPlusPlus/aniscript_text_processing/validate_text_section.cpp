@@ -5,10 +5,10 @@
 bool aniscript::validate_text_line(std::list<string>::iterator &line, size_t &cur_offset, text_context *ctx)
 {
 	int index = 0;
-	while(isblank(line->data()[index++])) {};
+	while(isblank(line->data()[index])) { index++; };
 	char *command_name = (char*)(line->data() + index);
 	int len = 1;
-	while(isalnum(command_name[len] != '\0' && (command_name[len]) || command_name[len] == '_')) { len++; }
+	while(command_name[len] != '\0' && isalnum(command_name[len]) || command_name[len] == '_') { len++; }
 	size_t cur_offset_copy = cur_offset;
 	instructions[cur_offset_copy] = instruction::first_pass_text(line, command_name, len, cur_offset);
 
@@ -30,6 +30,10 @@ bool aniscript::validate_text_section(text_context* const ctx, size_t& cur_offse
 		size_t label_end = text_section_copy->find(':');
 		if(label_end != string::npos)
 		{
+			size_t index = 0;
+			while(isblank(text_section_copy->at(index))){ index++; }
+			string label = text_section_copy->substr(index, label_end - index);
+			label_to_offset_map[label] = cur_offset;
 			text_section_copy++;
 			continue;
 		}

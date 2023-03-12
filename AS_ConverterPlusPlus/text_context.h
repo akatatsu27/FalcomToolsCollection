@@ -162,6 +162,8 @@ private:
 			lines.erase(defineLine);
 		}
 	}
+#undef blank
+#undef notblank
 	void process_directives()
 	{
 		for(std::list<string>::iterator line = lines.begin(); line != lines.end(); )

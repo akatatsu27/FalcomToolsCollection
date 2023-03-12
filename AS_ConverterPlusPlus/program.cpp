@@ -91,11 +91,11 @@ int main(int argc, char** argv)
         bool succ = ParseBinary(&entry.path());
     }
 	printf("completed processing binaries\n");
-	//for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
-    //{
-    //    //if(entry.path().filename() == "") { continue; }
-    //    bool succ = Preprocess(&entry.path());
-    //}
+	for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
+    {
+        //if(entry.path().filename() == "") { continue; }
+        bool succ = Preprocess(&entry.path());
+    }
     auto t2 = high_resolution_clock::now();
 
     /* Getting number of milliseconds as an integer. */

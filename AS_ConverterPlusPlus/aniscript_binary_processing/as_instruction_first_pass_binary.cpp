@@ -1,6 +1,7 @@
 #include "../as_instruction.h"
+#include "../aniscript.h"
 
-instruction instruction::first_pass_binary(binary_context *const ctx)
+instruction instruction::first_pass_binary(binary_context *const ctx, aniscript* const ani)
 {
 #define b ctx->u8()
 #define s ctx->u16()
@@ -17,15 +18,18 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x01:
 		instr.targetOffset = s;
 		return instr;
-	case 0x02:
-		ctx->position += select_sub_chip::size;
-		return instr;
-	case 0x03:
-		ctx->position += deg::size;
-		return instr;
-	case 0x04:
-		ctx->position += as_04::size;
-		return instr;
+	case 0x02:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x03:{
+		uint8 target = b; uint16 op2 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x04:{
+		uint8 target = b; uint8 op2 = b; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x05:
 		ctx->position += as_05::size;
 		return instr;
@@ -34,24 +38,29 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 		return instr;
 	case 0x07: // no operands
 		return instr;
-	case 0x08:
-		ctx->position += teleport::size;
-		return instr;
+	case 0x08:{
+		uint8 target1 = b; uint8 target2 = b; uint32 op3 = i; uint32 op4 = i; uint32 op5 = i;
+		ani->targets_in_file.insert(target1);
+		ani->targets_in_file.insert(target2);
+		return instr;}
 	case 0x09:
 		ctx->position += as_09::size;
 		return instr;
 	case 0x0A:
 		ctx->position += as_0a::size;
 		return instr;
-	case 0x0B:
-		ctx->position += turn::size;
-		return instr;
+	case 0x0B:{
+		uint8 target = b; uint8 op2 = b; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x0C:
 		ctx->position += as_0c::size;
 		return instr;
-	case 0x0D:
-		ctx->position += jump::size;
-		return instr;
+	case 0x0D:{
+		uint8 target1 = b; uint8 target2 = b; uint32 op3 = i; uint32 op4 = i; uint32 op5 = i; uint16 op6 = s; uint16 op7 = s;
+		ani->targets_in_file.insert(target1);
+		ani->targets_in_file.insert(target2);
+		return instr;}
 	case 0x0E:
 		ctx->position += drop_down::size;
 		return instr;
@@ -61,9 +70,10 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x10:
 		ctx->position += jump_back::size;
 		return instr;
-	case 0x11:
-		ctx->position += move::size;
-		return instr;
+	case 0x11:{
+		uint8 target = b; uint8 op2 = b; uint32 op3 = i; uint32 op4 = i; uint32 op5 = i; uint32 op6 = i; uint8 op7 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x12:
 		s; str;
 		return instr;
@@ -73,27 +83,33 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x14:
 		ctx->position += as_14::size;
 		return instr;
-	case 0x15:
-		ctx->position += wait_effect::size;
-		return instr;
-	case 0x16:
-		ctx->position += finish_effect::size;
-		return instr;
-	case 0x17:
-		ctx->position += cancel_effect::size;
-		return instr;
-	case 0x18:
-		ctx->position += show_effect::size;
-		return instr;
+	case 0x15:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x16:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x17:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x18:{
+		uint8 op1 = b; uint8 op2 = b; uint8 target = b; uint16 op4 = s; uint32 op5 = i; uint32 op6 = i; uint32 op7 = i;
+        uint16 op8 = s; uint16 op9 = s; uint16 op10 = s; uint32 op11 = s; uint16 op12 = s; uint32 op13 = s; uint8 op14 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x19:{
 		b; b; str; s; i; i; i; s; s; s; s; s; s; b;
 		return instr;}
 	case 0x1A:
 		ctx->position += as_1a::size;
 		return instr;
-	case 0x1B:
-		ctx->position += select_chip::size;
-		return instr;
+	case 0x1B:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x1C:
 		ctx->position += damage::size;
 		return instr;
@@ -112,18 +128,22 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x21:
 		ctx->position += as_21::size;
 		return instr;
-	case 0x22:
-		b; b; instr.targetOffset = s; b;
-		return instr;
-	case 0x23:
-		ctx->position += wait_thread::size;
-		return instr;
-	case 0x24:
-		ctx->position += set_chip_mode_flag::size;
-		return instr;
-	case 0x25:
-		ctx->position += clear_chip_mode_flag::size;
-		return instr;
+	case 0x22:{
+		uint8 target = b; uint8 op2 = b; instr.targetOffset = s; uint8 op4 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x23:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x24:{
+		uint8 op1 = b; uint8 target = b; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x25:{
+		uint8 op1 = b; uint8 target = b; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x26:
 		ctx->position += as_26::size;
 		return instr;
@@ -141,15 +161,18 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 		return instr;
 	case 0x2B: // no operands
 		return instr;
-	case 0x2C:
-		ctx->position += shadow_begin::size;
-		return instr;
-	case 0x2D:
-		ctx->position += shadow_end::size;
-		return instr;
-	case 0x2E:
-		ctx->position += shake_char::size;
-		return instr;
+	case 0x2C:{
+		uint8 target = b; uint16 op2 = s; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x2D:{
+		uint8 target = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x2E:{
+		uint8 target = b; uint32 op2 = i; uint32 op3 = i; uint32 op4 = i;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x2F:
 		ctx->position += suspend_thread::size;
 		return instr;
@@ -212,9 +235,10 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x40:
 		ctx->position += as_40::size;
 		return instr;
-	case 0x41:
-		ctx->position += lock_angle::size;
-		return instr;
+	case 0x41:{
+		uint8 target = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x42:
 		ctx->position += as_42::size;
 		return instr;
@@ -289,18 +313,21 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x5B:
 		ctx->position += as_5b::size;
 		return instr;
-	case 0x5C:
-		ctx->position += show::size;
-		return instr;
-	case 0x5D:
-		ctx->position += hide::size;
-		return instr;
+	case 0x5C:{
+		uint8 target = b; uint32 op2 = i;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x5D:{
+		uint8 target = b; uint32 op2 = i;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x5E:
 		ctx->position += as_5e::size;
 		return instr;
-	case 0x5F:
-		ctx->position += as_5f::size;
-		return instr;
+	case 0x5F:{
+		uint8 target = b; uint8 op2 = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x60:
 		ctx->position += as_60::size;
 		return instr;
@@ -419,9 +446,10 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x88:
 		ctx->position += voice::size;
 		return instr;
-	case 0x89:
-		ctx->position += save_cur_pos::size;
-		return instr;
+	case 0x89:{
+		const unsigned char target = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x8A:
 		ctx->position += clone::size;
 		return instr;
@@ -468,9 +496,10 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 		return instr;
 	case 0x95: // no operands
 		return instr;
-	case 0x96:
-		b; str; s;
-		return instr;
+	case 0x96:{
+		const uint8 target = b; char *op2 = str; uint16 op3 = s;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x97:
 		ctx->position += move_angle::size;
 		return instr;
@@ -486,9 +515,10 @@ instruction instruction::first_pass_binary(binary_context *const ctx)
 	case 0x9B:
 		ctx->position += as_9b::size;
 		return instr;
-	case 0x9C:
-		ctx->position += reset_chip_status::size;
-		return instr;
+	case 0x9C:{
+		const uint8 target = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x9D:
 		ctx->position += as_9d::size;
 		return instr;

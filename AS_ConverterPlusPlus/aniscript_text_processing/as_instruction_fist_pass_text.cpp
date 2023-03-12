@@ -78,7 +78,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[1][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"add_effect\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"add_effect\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 2 + (strlen(args[1]) - 2 + 1); //exclude beginning and end ", but add null byte to the length
@@ -111,7 +111,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[2][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"show_3d_effect\" third operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"show_3d_effect\" third operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + 1 + (strlen(args[2]) -2 + 1) + 2 + 4 + 4 + 4 + 2 + 2 + 2 + 2 + 2 + 2 + 1;
@@ -168,7 +168,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[1][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"char_say\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"char_say\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + (strlen(args[1]) - 2 + 1) + 4; //exclude beginning and end ", but add null byte to the length
@@ -186,7 +186,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[0][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"tip_text\" first operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"tip_text\" first operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += (strlen(args[0]) - 2 + 1) + 4; //exclude beginning and end ", but add null byte to the length
@@ -206,9 +206,24 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 	case suspend_thread::hash:
 		cur_offset += suspend_thread::size;
 		return instr;
-	case hash("as_30"):{
-		auto copy = *line;
-		size_t cnt = boost::count(copy, ',') + 1;
+	case hash("char_say_random"):{
+		string copy = *line;
+		size_t cnt = 0;
+		std::stringstream ss;
+		ss << copy;
+		while (ss >> std::ws) {
+			std::string csvElement;
+ 
+			if (ss.peek() == '"') {
+				ss >> std::quoted(csvElement);
+				std::string discard;
+				std::getline(ss, discard, ',');
+			}
+			else {
+				std::getline(ss, csvElement, ',');
+			}
+			cnt++;
+		}
 		if(!parse_assembly_instruction(copy, &name_check, cnt, args))
 		{
 			instr.opcode = 0xFF;
@@ -220,7 +235,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 			if(args[i][0] != '\"')
 			{
 				instr.opcode = 0xFF;
-				printf("[ERROR] \"as_30\" all operands except the first must be strings!\n\t%s", line->data());
+				printf("[ERROR] \"char_say_random\" all operands except the first must be strings!\n\t%s\n", line->data());
 				return instr;
 			}
 			total_len += (strlen(args[i]) -2 + 1);
@@ -399,7 +414,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[0][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"scraft_cut_in\" operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"scraft_cut_in\" operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += (strlen(args[0]) - 2 + 1) ; //exclude beginning and end ", but add null byte to the length
@@ -530,7 +545,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[1][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"load_x_file\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"load_x_file\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + (strlen(args[1]) - 2 + 1);
@@ -563,7 +578,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[2][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"as_93\" third operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"as_93\" third operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + 1 + (strlen(args[0]) - 2 + 1) ; //exclude beginning and end ", but add null byte to the length
@@ -578,7 +593,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[1][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"as_94\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"as_94\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + (strlen(args[1]) - 2 + 1) + 4; //exclude beginning and end ", but add null byte to the length
@@ -596,7 +611,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[1][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"set_angle_target\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"set_angle_target\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + (strlen(args[1]) - 2 + 1) + 2; //exclude beginning and end ", but add null byte to the length
@@ -638,7 +653,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		if(args[3][0] != '\"')
 		{
 			instr.opcode = 0xFF;
-			printf("[ERROR] \"as_a0\" second operand must be a string!\n\t%s", line->data());
+			printf("[ERROR] \"as_a0\" second operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
 		cur_offset += 1 + 4 + 2 + (strlen(args[3]) - 2 + 1); //exclude beginning and end ", but add null byte to the length
@@ -701,7 +716,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		cur_offset += as_b1::size;
 		return instr;
 	default:
-		printf("[ERROR] invalid as_instruction name:\t%.*s", len, name);
+		printf("[ERROR] invalid as_instruction name:\t%.*s\n", len, name);
 		instr.opcode = 0xFF;
 		return instr;
 	}
