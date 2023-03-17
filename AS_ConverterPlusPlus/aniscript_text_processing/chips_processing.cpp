@@ -55,7 +55,7 @@ bool aniscript::validate_chips_section(text_context* const ctx, size_t& cur_offs
 			chip_section_copy++;
 			continue;
 		}
-		has_errors = validate_chip_line(chip_section_copy, cur_offset, ctx);
+		has_errors |= validate_chip_line(chip_section_copy, cur_offset, ctx);
 		chip_section_copy++;
 	}
 	if((cur_offset - cur_offset_copy) % 8 != 0)
@@ -64,5 +64,70 @@ bool aniscript::validate_chips_section(text_context* const ctx, size_t& cur_offs
 		has_errors = true;
 	}
 	cur_offset += 4; //terminator "entry"
+	return has_errors;
+}
+
+bool aniscript::write_binary_chip_line(std::list<string>::iterator &line)
+{
+	bool has_errors = false;
+	char *command_name;
+	char *args[20];
+	size_t cnt = boost::count(*line, ',') + 1;
+	if (!parse_assembly_instruction(*line, &command_name, cnt, args))
+		return true;
+	switch (instruction::hash(command_name))
+	{
+	case instruction::hash("DB"):
+	case instruction::hash("db"):
+		for(int i = 0; i < cnt; i++)
+		{
+			auto num = num_from_str(args[i], 1);
+			if(num == ULLONG_MAX)
+			{
+				has_errors = true;
+				break;
+			}
+			u8((uint8)num);
+		}
+		break;
+	case instruction::hash("DW"):
+	case instruction::hash("dw"):
+		for(int i = 0; i < cnt; i++)
+		{
+			auto num = num_from_str(args[i], 2);
+			if(num == ULLONG_MAX)
+			{
+				has_errors = true;
+				break;
+			}
+			u16((uint16)num);
+		}
+		break;
+	}
+	return has_errors;
+}
+bool aniscript::write_binary_chips_section(text_context* const ctx)
+{
+	auto chip_section_copy = chip_section;
+	bool has_errors = false;
+	chip_section_copy++;
+	size_t cur_offset_copy = cur_offset;
+	while (chip_section_copy != model_3d_section && chip_section_copy != bones_3d_section
+		&& chip_section_copy != unk_bytes_section && chip_section_copy != text_section && chip_section_copy != ctx->lines.end())
+	{
+		if (chip_section_copy->find_first_not_of(" \t") == string::npos)
+		{
+			chip_section_copy++;
+			continue;
+		}
+		if (chip_section_copy->find(':') != string::npos)
+		{
+			chip_section_copy++;
+			continue;
+		}
+		has_errors |= write_binary_chip_line(chip_section_copy);
+		chip_section_copy++;
+	}
+	u32(0xFFFFFFFF); //terminator entry
 	return has_errors;
 }

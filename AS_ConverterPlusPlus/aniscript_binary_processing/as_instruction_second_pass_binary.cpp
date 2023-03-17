@@ -720,7 +720,7 @@ void instruction::second_pass_binary(binary_context* const ctx, string* const te
         if (op1 == 0x02)
         {
             uint16 op2 = s;
-            sprintf(&buffer[0], "%s, 0x%04X\n", as_a402::name, op2);
+            sprintf(&buffer[0], "%s 0x%04X\n", as_a402::name, op2);
         }
         else if (op1 == 0x00)
         {
@@ -761,9 +761,16 @@ void instruction::second_pass_binary(binary_context* const ctx, string* const te
         uint32 op1 = i; uint32 op2 = i;
         sprintf(&buffer[0], "%s 0x%08X, 0x%08X\n", as_aa::name, op1, op2);
         txt return;}
-    case 0xAB:{
-        uint8 op1 = b; uint8 op2 = b; uint8 op3 = b;
-        sprintf(&buffer[0], "%s 0x%02X, 0x%02X, 0x%02X\n", as_ab::name, op1, op2, op3);
+    case 0xAB:{ // has cases for target 0xFF, 0xFE, and 0xEA
+        uint8 op1 = b; uint8 target = b; uint8 op3 = b;
+        const char* const target_name = instruction::get_target_name(target);
+        if(op1 == 0 || op1 == 1)
+        {
+            uint32 op4 = i;
+            sprintf(&buffer[0], "as_ab%02X %s, 0x%02X, 0x%08X\n", op1, target_name, op3, op4);
+        }
+        else
+            sprintf(&buffer[0], "%s 0x%02X, %s, 0x%02X\n", as_ab::name, op1, target_name, op3);
         txt return;}
     case 0xAC:{
         uint8 op1 = b; uint8 op2 = b; uint32 op3 = i; uint32 op4 = i; uint8 op5 = b;

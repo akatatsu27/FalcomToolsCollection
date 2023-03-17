@@ -198,7 +198,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		cur_offset += shadow_begin::size;
 		return instr;
 	case shadow_end::hash:
-		cur_offset += shadow_end::hash;
+		cur_offset += shadow_end::size;
 		return instr;
 	case shake_char::hash:
 		cur_offset += shake_char::size;
@@ -240,6 +240,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 			}
 			total_len += (strlen(args[i]) -2 + 1);
 		}
+		total_len += 1; //null byte at the end
 		cur_offset += total_len;
 		return instr;}
 	case as_31::hash:
@@ -581,7 +582,7 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 			printf("[ERROR] \"as_93\" third operand must be a string!\n\t%s\n", line->data());
 			return instr;
 		}
-		cur_offset += 1 + 1 + (strlen(args[0]) - 2 + 1) ; //exclude beginning and end ", but add null byte to the length
+		cur_offset += 1 + 1 + (strlen(args[2]) - 2 + 1) ; //exclude beginning and end ", but add null byte to the length
 		return instr;}
 	case hash("as_94"):{
 		string copy = *line;
@@ -696,6 +697,12 @@ instruction instruction::first_pass_text(std::list<string>::iterator &line, char
 		return instr;
 	case as_ab::hash:
 		cur_offset += as_ab::size;
+		return instr;
+	case as_ab00::hash:
+		cur_offset += as_ab00::size;
+		return instr;
+	case as_ab01::hash:
+		cur_offset += as_ab01::size;
 		return instr;
 	case as_ac::hash:
 		cur_offset += as_ac::size;

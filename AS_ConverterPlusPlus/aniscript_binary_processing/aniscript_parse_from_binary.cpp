@@ -86,13 +86,12 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 		++it;
 	}
 	//Writing
-	for(auto target_it = targets_in_file.begin(); target_it != targets_in_file.end(); target_it++)
+	for(uint8 target : targets_in_file)
 	{
-		const char* const target_name = instruction::get_target_name(*target_it);
-		snprintf(buffer.data(), buffer.size(), "%%define %s 0x%02X\n", target_name, *target_it);
+		const char* const target_name = instruction::get_target_name(target);
+		snprintf(buffer.data(), buffer.size(), "%%define %s 0x%02X\n", target_name, target);
 		text->append(&buffer[0]);
 	}
-	//text->append("%define self 0xFF\n");
 	text->append("%macro subchip_update 3\nselect_sub_chip $1, $2\nsleep $3\nupdate\n%endmacro\n");
 	text->append("section chip_entries:\n");
 	for (uint8 i = 0; i < chip_entries.size(); i++)

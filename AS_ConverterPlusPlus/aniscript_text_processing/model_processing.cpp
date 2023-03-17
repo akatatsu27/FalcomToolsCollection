@@ -52,3 +52,45 @@ bool aniscript::validate_model_section(text_context* const ctx, size_t& cur_offs
     cur_offset += 1; //terminator null byte
     return has_errors;
 }
+
+bool aniscript::write_binary_model_line(std::list<string>::iterator &line)
+{
+    bool has_errors = false;
+    char *command_name;
+	char *args[20];
+	size_t cnt = boost::count(*line, ',') + 1;
+	if (!parse_assembly_instruction(*line, &command_name, cnt, args))
+		return true;
+	for (int i = 0; i < cnt; i++)
+	{
+		size_t index = 1; //skip '\"'
+		do
+		{
+			u8(args[i][index]);
+			index++;
+		} while (args[i][index] != '\"');
+		u8(0); //terminate the string
+	}
+
+    return has_errors;
+}
+
+bool aniscript::write_binary_model_section(text_context* const ctx)
+{
+    bool has_errors = false;
+	auto model_3d_section_copy = model_3d_section;
+	model_3d_section_copy++;
+	while (model_3d_section_copy != chip_section && model_3d_section_copy != bones_3d_section
+		&& model_3d_section_copy != unk_bytes_section && model_3d_section_copy != text_section && model_3d_section_copy != ctx->lines.end())
+	{
+		if (model_3d_section_copy->find_first_not_of(" \t") == string::npos)
+		{
+			model_3d_section_copy++;
+			continue;
+		}
+		has_errors |= write_binary_model_line(model_3d_section_copy);
+		model_3d_section_copy++;
+	}
+    u8(0); //terminator null byte
+    return has_errors;
+}

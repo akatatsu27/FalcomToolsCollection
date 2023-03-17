@@ -76,7 +76,7 @@ inline bool seek_next_operand(const char* const str, size_t& pos, bool already_p
         {
             if(!is_legal_start(str[pos]))
             {
-                printf("illegal character %c\n", str[pos]);
+                printf("illegal character %c at start\n", str[pos]);
                 return false;
             }
             return true;
@@ -122,7 +122,7 @@ bool parse_assembly_instruction(std::string& string, char** name, size_t expecte
     }
     if(!is_legal_start(str[pos]))
     {
-        printf("illegal character %c\n", str[pos]);
+        printf("illegal character %c at start of operand\n", str[pos]);
         return false;
     }
     args[args_count++] = (char*)(str + pos); //operand 1
@@ -130,7 +130,7 @@ bool parse_assembly_instruction(std::string& string, char** name, size_t expecte
     {
         if(!(isblank(str[pos]) || str[pos] == ','))
         {
-            printf("illegal character %c\n", str[pos]);
+            printf("illegal character %c in operand\n", str[pos]);
             return false;
         }
         else str[pos++] = '\0';

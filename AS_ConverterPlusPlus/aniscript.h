@@ -75,6 +75,7 @@ struct aniscript
     std::unordered_set<uint8> targets_in_file; // all files make use of 0xFF (self), but there's a lot more possible targets. we want to %define only when needed.
     std::unordered_map<uint16, FCArray<100>> labels;
     std::unordered_map<string, uint16> label_to_offset_map;
+    uint16 event_label_offsets[TOTAL_EVENT_LABELS];
     static constexpr char label_names[TOTAL_EVENT_LABELS][25] = {"FUN01", "FUN02", "FUN03", "FUN04", "FUN05", "FUN06", "FUN07", "FUN08",
         "FUN09", "FUN0A", "FUN0B", "FUN0C", "FUN0D", "FUN0E", "FUN0F", "FUN10", "FUN11", "FUN12", "FUN13", "FUN14", "FUN15",
         "FUN16", "FUN17", "FUN18", "FUN19", "FUN1A", "FUN1B", "FUN1C", "FUN1D", "FUN1E", "FUN1F", "FUN20", "FUN21", "FUN22"};
@@ -84,11 +85,16 @@ struct aniscript
     std::list<string>::iterator unk_bytes_section;
     std::list<string>::iterator text_section;
     present_sections sections;
+    char* assembled_binary = nullptr;
+    size_t assembled_binary_size;
+    size_t cur_offset;
 
     aniscript(){sections.init();}
 
+    ~aniscript(){if(assembled_binary != nullptr) delete[] assembled_binary;}
+
     bool ParseFromBinary(binary_context* const ctx, string* const text);
-    bool CompileFromText(text_context* const ctx, std::vector<char>* const binary);
+    bool CompileFromText(text_context* const ctx);
     void new_label(text_context* const ctx, string label_name, char& event_funct_count, bool* const found_event_label);
     void new_section(text_context* const ctx, string section_name, std::list<string>::iterator it);
     bool validate_chips_section(text_context* const ctx, size_t& cur_offset);
@@ -97,4 +103,71 @@ struct aniscript
     bool validate_unk_bytes_section(text_context* const ctx, size_t& cur_offset);
     bool validate_text_section(text_context* const ctx, size_t& cur_offset);
     bool validate_text_line(std::list<string>::iterator &line, size_t &pos, text_context *ctx);
+    bool write_binary_chip_line(std::list<string>::iterator &line);
+    bool write_binary_chips_section(text_context* const ctx);
+    bool write_binary_model_line(std::list<string>::iterator &line);
+    bool write_binary_model_section(text_context* const ctx);
+    bool write_binary_bones_unk00(std::list<string>::iterator &line);
+    bool write_binary_bones_line(std::list<string>::iterator &line);
+    bool write_binary_bones_section(text_context* const ctx);
+    bool write_binary_unk_bytes_line(std::list<string>::iterator &line);
+    bool write_binary_unk_bytes_section(text_context* const ctx);
+
+    void u8(const uint8 val){*(uint8*)(assembled_binary + cur_offset) = val; cur_offset += 1;}
+    void u16(const uint16 val){*(uint16*)(assembled_binary + cur_offset) = val; cur_offset += 2;}
+    void u32(const uint32 val){*(uint32*)(assembled_binary + cur_offset) = val; cur_offset += 4;}
+    inline void str(const char* const val)
+    {
+        size_t str_offset = 1; //skip '\"'
+        do
+        {
+            *(char*)(assembled_binary + cur_offset) = val[str_offset];
+            cur_offset += 1;
+            str_offset += 1;
+        } while (val[str_offset] != '\"');
+    }
+
+    static unsigned long long num_from_str(const char* const str, char length)
+    {
+        char* end = nullptr;
+        auto num = std::strtoul(str, &end, 0);
+        if (errno == ERANGE)
+        {
+            errno = 0;
+            printf("range error: %s \n", str);
+            return ULLONG_MAX;
+        }
+        if(end == nullptr || *end != '\0')
+        {
+            printf("Cannot convert %s to an integer\n", str);
+            return ULLONG_MAX;
+        }
+        switch(length)
+        {
+        case 1:
+            if(num > 0xFF)
+            {
+                printf("range error: 0x%X bigger than max size of byte (0xFF)\n", num);
+                return ULLONG_MAX;
+            }
+            return num;
+        case 2:
+            if(num > 0xFFFF)
+            {
+                printf("range error: 0x%X bigger than max size of int16 (0xFFFF)\n", num);
+                return ULLONG_MAX;
+            }
+            return num;
+        case 4:
+            if(num > 0xFFFFFFFF)
+            {
+                printf("range error: 0x%X bigger than max size of int32 (0xFFFFFFFF)\n", num);
+                return ULLONG_MAX;
+            }
+            return num;
+        default:
+            printf("[DEBUG] Invalid size specifier %d", length);
+            return ULLONG_MAX;
+        }
+    }
 };

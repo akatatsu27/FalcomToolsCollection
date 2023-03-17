@@ -4,8 +4,9 @@
 #include "aniscript.h"
 #include "parse_assembly_line.h"
 
-bool aniscript::CompileFromText(text_context *const ctx, vector<char> *const binary)
+bool aniscript::CompileFromText(text_context *const ctx)
 {
+	printf("[INFO] %ls:\n\tassembling binary...\n", ctx->filename.c_str());
 	bool has_errors = false;
 	char event_funct_count = 0;
 	bool found_event_label[TOTAL_EVENT_LABELS] = {false};
@@ -37,7 +38,7 @@ bool aniscript::CompileFromText(text_context *const ctx, vector<char> *const bin
 		}
 		else
 		{
-			printf("[ERROR] %ls:\n\tmalformed label or section definition:\n\t%s\n", ctx->filename.c_str(), line->data());
+			printf("[ERROR] %ls:\n\tmalformed label or section definition:\n\t%s\n", ctx->filename.c_str(), line->c_str());
 			has_errors = true;
 		}
 	}
@@ -82,9 +83,11 @@ bool aniscript::CompileFromText(text_context *const ctx, vector<char> *const bin
 		has_errors = true;
 	}
 	//check for missing "extra" events in-between "extra" events
-	for(int i = TOTAL_EVENT_LABELS -1; i > MANDATORY_EVENT_LABELS; i--)
+	char event_label_num = 30;
+	for(int i = TOTAL_EVENT_LABELS - 1; i > MANDATORY_EVENT_LABELS - 1; i--)
 	{
 		if(!found_event_label[i]) continue;
+		event_label_num = i + 1;
 		for(int j = i; j > MANDATORY_EVENT_LABELS; j--)
 		{
 			if(!found_event_label[j])
@@ -100,14 +103,48 @@ bool aniscript::CompileFromText(text_context *const ctx, vector<char> *const bin
 		return false;
 	}
 	// calculate offsets
-	size_t cur_offset = 4; // skip craft_offset_table_offset and craft_offset_table_offset_end
+	bones_3d_offset = 0;
+	cur_offset = 4; // skip craft_offset_table_offset and craft_offset_table_offset_end
 	cur_offset += 2; // bones_3d_offset	
 
 	has_errors |= validate_chips_section(ctx, cur_offset);
 	has_errors |= validate_model_section(ctx, cur_offset);
+	size_t cur_offset_copy = cur_offset;
 	has_errors |= validate_bones_section(ctx, cur_offset);
+	if(cur_offset != cur_offset_copy)
+	{
+		bones_3d_offset = cur_offset_copy;
+	}
+	craft_offset_table_offset = cur_offset;
 	cur_offset += 2 * event_funct_count;
+	craft_offset_table_offset_end = cur_offset;
 	has_errors |= validate_unk_bytes_section(ctx, cur_offset);
 	has_errors |= validate_text_section(ctx, cur_offset);
-	return true;
+	if(has_errors) return false;
+	if(cur_offset > 0xFFFF)
+	{
+		printf("[ERROR] %ls:\n\tresulting binary is too big! (0x%04X bytes)\n", ctx->filename.c_str(), cur_offset);
+		return false;
+	}
+
+	//write
+	assembled_binary_size = cur_offset;
+	cur_offset = 0;
+	assembled_binary = new char[assembled_binary_size*2];
+	u16(craft_offset_table_offset);
+	u16(craft_offset_table_offset_end);
+	u16(bones_3d_offset);
+	has_errors |= write_binary_chips_section(ctx);
+	has_errors |= write_binary_model_section(ctx);
+	has_errors |= write_binary_bones_section(ctx);
+	for(int i = 0; i < event_label_num; i++)
+	{
+		u16(event_label_offsets[i]);
+	}
+	has_errors |= write_binary_unk_bytes_section(ctx);
+	for(auto instr : instructions)
+	{
+		has_errors |= instr.second.second_pass_text(this);
+	}
+	return !has_errors;
 }

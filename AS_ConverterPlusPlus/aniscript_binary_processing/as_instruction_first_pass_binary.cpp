@@ -576,9 +576,11 @@ instruction instruction::first_pass_binary(binary_context *const ctx, aniscript*
 	case 0xAA:
 		ctx->position += as_aa::size;
 		return instr;
-	case 0xAB:
-		ctx->position += as_ab::size;
-		return instr;
+	case 0xAB:{
+		uint8 op1 = b; uint8 target = b; b;
+		if(op1 == 0 || op1 == 1) i;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0xAC:
 		ctx->position += as_ac::size;
 		return instr;
