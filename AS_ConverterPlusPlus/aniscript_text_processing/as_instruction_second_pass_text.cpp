@@ -1153,12 +1153,14 @@ bool instruction::second_pass_text(aniscript* const ani)
 		return false;
 	case as_ab00::hash:
     	u8(as_ab00::opcode);
+		u8(0x00);
 		if(!parse_assembly_instruction(*line, &name_check, 3, args))
             return true;
 		b(0) b(1) i(2)
 		return false;
 	case as_ab01::hash:
     	u8(as_ab01::opcode);
+		u8(0x01);
 		if(!parse_assembly_instruction(*line, &name_check, 3, args))
             return true;
 		b(0) b(1) i(2)
@@ -1199,6 +1201,9 @@ bool instruction::second_pass_text(aniscript* const ani)
             return true;
 		b(0) s(1)
 		return false;
+	default:
+		printf("[ERROR] an error occured while processing instruction");
+		return false;
 	}
 	#undef u8
 	#undef u16
@@ -1206,5 +1211,4 @@ bool instruction::second_pass_text(aniscript* const ani)
 	#undef s
 	#undef i
 	#undef str
-	return true; //silence compiler warning
 }

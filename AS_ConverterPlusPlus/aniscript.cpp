@@ -130,7 +130,7 @@ bool aniscript::CompileFromText(text_context *const ctx)
 	//write
 	assembled_binary_size = cur_offset;
 	cur_offset = 0;
-	assembled_binary = new char[assembled_binary_size*2];
+	assembled_binary = new char[assembled_binary_size];
 	u16(craft_offset_table_offset);
 	u16(craft_offset_table_offset_end);
 	u16(bones_3d_offset);

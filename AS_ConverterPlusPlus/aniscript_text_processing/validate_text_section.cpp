@@ -12,11 +12,18 @@ bool aniscript::validate_text_line(std::list<string>::iterator &line, size_t &cu
 	size_t cur_offset_copy = cur_offset;
 	instructions[cur_offset_copy] = instruction::first_pass_text(line, command_name, len, cur_offset);
 
-    return instructions[cur_offset_copy].opcode == 0xFF;
+    bool has_errors = false;
 	if(cur_offset > 0xFFFF)
 	{
 		printf("[ERROR] %ls\n\tresulting binary is too big! Error happened on instruction: %.*s\n", ctx->filename.c_str(), command_name);
+		has_errors = true;
 	}
+	has_errors |= instructions[cur_offset_copy].opcode == 0xFF;
+	if(has_errors)
+	{
+		bool foo = true;
+	}
+	return has_errors;
 }
 
 bool aniscript::validate_text_section(text_context* const ctx, size_t& cur_offset)
@@ -24,6 +31,8 @@ bool aniscript::validate_text_section(text_context* const ctx, size_t& cur_offse
     bool has_errors = false;
 	auto text_section_copy = text_section;
 	text_section_copy++;
+	boost::smatch what;
+	static const boost::regex label_pattern("[ \\t]*([\\w_]+)[ \\t]*:[ \\t]*");
 	while (text_section_copy != chip_section && text_section_copy != bones_3d_section
 		&& text_section_copy != unk_bytes_section && text_section_copy != model_3d_section && text_section_copy != ctx->lines.end())
 	{
@@ -32,12 +41,11 @@ bool aniscript::validate_text_section(text_context* const ctx, size_t& cur_offse
 			text_section_copy++;
 			continue;
 		}
-		size_t label_end = text_section_copy->find(':');
-		if(label_end != string::npos)
+		if(boost::regex_match(*text_section_copy, what, label_pattern))
 		{
 			size_t index = 0;
 			while(isblank(text_section_copy->at(index))){ index++; }
-			string label = text_section_copy->substr(index, label_end - index);
+			string label = what[1];
 			label_to_offset_map[label] = cur_offset;
 			//is it an event label?
 			for(int i = 0; i < TOTAL_EVENT_LABELS; i++)

@@ -75,8 +75,14 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 			++it;
 			continue;
 		}
+		else if (toff == 0x0C) //0x0C is an invalid offset that is present in "AS04230 ._DT" and "AS04240 ._DT"
+		{
+			auto beninging = instructions.begin();
+			it->second.labelName = labels[beninging->first][0].data(); //simply point them to the first instruction, which is end_event.
+			++it;
+			continue;
+		}
 
-		instruction func = instructions[toff];
 		if (auto labelV = labels.find(toff); labelV == labels.end()) // labels don't exist. create a new label vector
 		{
 			snprintf(buffer.data(), buffer.size(), "loc%04X", toff);

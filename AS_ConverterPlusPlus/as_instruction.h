@@ -8,7 +8,7 @@ struct aniscript;
 struct instruction
 {
     size_t offset;
-    uint8 opcode;
+    uint8 opcode = 0x00;
 
 	uint16 targetOffset = 0;
 	char* labelName; //the label of the target offset
@@ -166,7 +166,7 @@ INSTRUCTION(2,as_14,0x14);
 INSTRUCTION(1+1,wait_effect,0x15);
 INSTRUCTION(1+1,finish_effect,0x16);
 INSTRUCTION(1+1,cancel_effect,0x17);
-INSTRUCTION(1 + 1 + 1 + 2 + 4 + 4 + 4 + 2 + 2 + 2 + 2 + 2 + 2 + 1,show_effect,0x18);
+INSTRUCTION(1+1+1+2+4+4+4+2+2+2+2+2+2+1,show_effect,0x18);
 //INSTRUCTION(x,show_3d_effect,0x19); variable length
 INSTRUCTION(1+2,as_1a,0x1a);
 INSTRUCTION(1+1,select_chip,0x1b);

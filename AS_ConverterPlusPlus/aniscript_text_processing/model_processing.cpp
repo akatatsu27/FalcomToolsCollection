@@ -28,7 +28,7 @@ bool validate_model_line(std::list<string>::iterator &line, size_t &pos, text_co
 			printf("[ERROR] %ls:\n\tnon-string operands aren't allowed in section \"model_3d\": %s\n", ctx->filename.c_str(), args[i]);
 			has_errors = true;
 		}
-        pos += strlen(args[i]) + 1; //"string" + \0
+        pos += strlen(args[i]) -2 + 1; //"string" + \0
 	}
 
     return has_errors;
