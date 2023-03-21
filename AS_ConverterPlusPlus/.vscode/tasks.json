@@ -13,6 +13,7 @@
                 "aniscript_text_processing\\*.cpp",
                 "asmag_processing\\*.cpp",
                 "asitem_processing\\*.cpp",
+                "asbs_processing\\*.cpp",
                 "*.cpp",                
                 "-o",
                 "${fileDirname}\\AS_Converter.exe"

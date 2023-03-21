@@ -3,6 +3,7 @@
 #include "aniscript.h"
 #include "asmag.h"
 #include "asitem.h"
+#include "asbs.h"
 
 bool ParseBinaryAniscript(const std::filesystem::path *fPath, base_aniscript* const as)
 {
@@ -75,39 +76,49 @@ int main(int argc, char** argv)
     for( const auto & entry : std::filesystem::directory_iterator( "DT30" ) )
     {
 
-		if(entry.path().filename() == "ASMAG000._DT")
+		if(entry.path().filename() == L"ASMAG000._DT")
 		{
 			asmag mag;
 			bool succ = ParseBinaryAniscript(&entry.path(), &mag);
 		}
-		else if(entry.path().filename() == "ASITEM  ._DT")
+		else if(entry.path().filename() == L"ASITEM  ._DT")
 		{
 			asitem item;
 			bool succ = ParseBinaryAniscript(&entry.path(), &item);
 		}
-		else
+		else if (!wcsncmp(entry.path().filename().c_str(), L"AS", 2))
 		{
 			aniscript as;
         	bool succ = ParseBinaryAniscript(&entry.path(), &as);
+		}
+		else if (!wcsncmp(entry.path().filename().c_str(), L"BS", 2))
+		{
+			asbs bs;
+			bool succ = ParseBinaryAniscript(&entry.path(), &bs);
 		}
     }
 	printf("completed processing binaries\n");
 	for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
     {
-		if(entry.path().filename() == "ASMAG000.as")
+		if(entry.path().filename() == L"ASMAG000.as")
 		{
 			asmag mag;
 			bool succ = ParseText(&entry.path(), &mag);
 		}
-		else if(entry.path().filename() == "ASITEM  .as")
+		else if(entry.path().filename() == L"ASITEM  .as")
 		{
 			asitem item;
 			bool succ = ParseText(&entry.path(), &item);
 		}
-		else
+		else if (!wcsncmp(entry.path().filename().c_str(), L"AS", 2))
 		{
 			aniscript as;
         	bool succ = ParseText(&entry.path(), &as);
+		}
+		else if (!wcsncmp(entry.path().filename().c_str(), L"BS", 2))
+		{
+			asbs bs;
+			bool succ = ParseText(&entry.path(), &bs);
 		}
     }
     auto t2 = high_resolution_clock::now();

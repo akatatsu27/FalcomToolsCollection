@@ -503,8 +503,7 @@ void instruction::second_pass_binary(binary_context* const ctx, string* const te
         sprintf(&buffer[0], "%s 0x%02X\n", as_71::name, op1);
         txt return;}
     case 0x72:{
-        uint8 op1 = b;
-        sprintf(&buffer[0], "%s 0x%02X\n", as_72::name, op1);
+        sprintf(&buffer[0], "%s\n", as_72::name);
         txt return;}
     case 0x73:{
         uint8 op1 = b;

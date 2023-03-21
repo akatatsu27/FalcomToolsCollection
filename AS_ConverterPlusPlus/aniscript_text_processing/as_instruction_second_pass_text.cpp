@@ -764,7 +764,7 @@ bool instruction::second_pass_text(base_aniscript* const ani)
     	u8(as_6f::opcode);
 		if(!parse_assembly_instruction(*line, &name_check, 2, args))
             return true;
-		b(0) b(0)
+		b(0) b(1)
 		return false;
 	case as_70::hash:
     	u8(as_70::opcode);
@@ -780,9 +780,8 @@ bool instruction::second_pass_text(base_aniscript* const ani)
 		return false;
 	case as_72::hash:
     	u8(as_72::opcode);
-		if(!parse_assembly_instruction(*line, &name_check, 1, args))
+		if(!parse_assembly_instruction(*line, &name_check, 0, args))
             return true;
-		b(0)
 		return false;
 	case as_73::hash:
     	u8(as_73::opcode);
