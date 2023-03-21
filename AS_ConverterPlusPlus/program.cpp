@@ -2,6 +2,7 @@
 #include <fstream>
 #include "aniscript.h"
 #include "asmag.h"
+#include "asitem.h"
 
 bool ParseBinaryAniscript(const std::filesystem::path *fPath, base_aniscript* const as)
 {
@@ -79,6 +80,11 @@ int main(int argc, char** argv)
 			asmag mag;
 			bool succ = ParseBinaryAniscript(&entry.path(), &mag);
 		}
+		else if(entry.path().filename() == "ASITEM  ._DT")
+		{
+			asitem item;
+			bool succ = ParseBinaryAniscript(&entry.path(), &item);
+		}
 		else
 		{
 			aniscript as;
@@ -92,6 +98,11 @@ int main(int argc, char** argv)
 		{
 			asmag mag;
 			bool succ = ParseText(&entry.path(), &mag);
+		}
+		else if(entry.path().filename() == "ASITEM  .as")
+		{
+			asitem item;
+			bool succ = ParseText(&entry.path(), &item);
 		}
 		else
 		{

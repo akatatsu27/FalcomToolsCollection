@@ -95,7 +95,6 @@ struct aniscript : public base_aniscript
     bool validate_bones_section(text_context* const ctx, size_t& cur_offset);
     bool validate_sprite_offsets_section(text_context* const ctx, size_t& cur_offset);
     bool validate_text_section(text_context* const ctx, size_t& cur_offset);
-    bool validate_text_line(std::list<string>::iterator &line, size_t &pos, text_context *ctx);
     bool write_binary_chip_line(std::list<string>::iterator &line);
     bool write_binary_chips_section(text_context* const ctx);
     bool write_binary_model_line(std::list<string>::iterator &line);

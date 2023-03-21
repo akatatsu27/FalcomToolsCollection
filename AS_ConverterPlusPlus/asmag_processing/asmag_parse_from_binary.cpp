@@ -1,6 +1,6 @@
-#include "aniscript.h"
-#include "as_instruction.h"
-#include "asmag.h"
+#include "../aniscript.h"
+#include "../as_instruction.h"
+#include "../asmag.h"
 
 bool asmag::parse_from_binary(binary_context *const ctx, string *text)
 {

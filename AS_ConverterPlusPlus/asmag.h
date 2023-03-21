@@ -29,7 +29,6 @@ struct asmag : public base_aniscript
 
     bool parse_from_binary(binary_context *const ctx, string *text) override;
     bool compile_from_text(text_context *const ctx) override;
-    bool validate_text_line(std::list<string>::iterator &line, size_t &cur_offset, text_context *ctx);
     void new_label(text_context *const ctx, string label_match, int& event_funct_count, bool *const found_event_label);
     void new_section(text_context *const ctx, string label_name, std::list<string>::iterator line);
     bool validate_text_section(text_context* const ctx, size_t& cur_offset);

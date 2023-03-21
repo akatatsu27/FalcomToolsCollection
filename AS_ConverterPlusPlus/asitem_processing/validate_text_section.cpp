@@ -1,8 +1,8 @@
-#include "../asmag.h"
+#include "../asitem.h"
 #include "../parse_assembly_line.h"
 #include <boost/range/algorithm/count.hpp>
 
-bool asmag::validate_text_section(text_context* const ctx, size_t& cur_offset)
+bool asitem::validate_text_section(text_context* const ctx, size_t& cur_offset)
 {
     bool has_errors = false;
 	auto text_section_copy = text_section;
@@ -23,11 +23,11 @@ bool asmag::validate_text_section(text_context* const ctx, size_t& cur_offset)
 			string label = what[1];
 			label_to_offset_map[label] = cur_offset;
 			//is it an event label?
-			for(int i = 0; i < ASMAG_TOTAL_FUNCTIONS; i++)
+			for(int i = 0; i < ASITEM_TOTAL_FUNCTIONS; i++)
 			{
 				if(strcmp(label.data(), label_names[i]) == 0)
 				{
-					magic_label_offsets[i] = cur_offset;
+					function_label_offsets[i] = cur_offset;
 					break;
 				}
 			}
@@ -40,7 +40,7 @@ bool asmag::validate_text_section(text_context* const ctx, size_t& cur_offset)
     return has_errors;
 }
 
-bool asmag::validate_super_special_section(text_context* const ctx, size_t& cur_offset)
+bool asitem::validate_super_special_section(text_context* const ctx, size_t& cur_offset)
 {
     bool has_errors = false;
 	auto super_special_section_section_copy = super_special_section_section;
@@ -60,12 +60,12 @@ bool asmag::validate_super_special_section(text_context* const ctx, size_t& cur_
 			while(isblank(super_special_section_section_copy->at(index))){ index++; }
 			string label = what[1];
 			label_to_offset_map[label] = cur_offset;
-			//is it a magic_function label?
-			for(int i = 0; i < ASMAG_TOTAL_FUNCTIONS; i++)
+			//is it a item_function label?
+			for(int i = 0; i < ASITEM_TOTAL_FUNCTIONS; i++)
 			{
 				if(strcmp(label.data(), label_names[i]) == 0)
 				{
-					magic_label_offsets[i] = cur_offset;
+					function_label_offsets[i] = cur_offset;
 					break;
 				}
 			}
