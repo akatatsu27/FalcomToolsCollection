@@ -1,18 +1,18 @@
 #include <filesystem>
 #include <fstream>
 #include "aniscript.h"
+#include "asmag.h"
 
-bool ParseBinary(const std::filesystem::path *fPath)
+bool ParseBinaryAniscript(const std::filesystem::path *fPath, base_aniscript* const as)
 {
 	namespace fs = std::filesystem;
 	binary_context ctx(fPath);
 	if (!ctx.isGood())
 		return false;
-	aniscript as;
 	std::string text;
 	try
 	{
-		if (!as.ParseFromBinary(&ctx, &text))
+		if (!as->parse_from_binary(&ctx, &text))
 			return false;
 	}
 	catch (...)
@@ -37,14 +37,13 @@ bool ParseBinary(const std::filesystem::path *fPath)
 	txtfile.close();
 	return true;
 }
-bool Preprocess(const std::filesystem::path *fPath)
+bool ParseText(const std::filesystem::path *fPath, base_aniscript* as)
 {
 	namespace fs = std::filesystem;
 	text_context ctx(fPath);
 	if (!ctx.isGood())
 		return false;
-	aniscript as;
-	if (!as.CompileFromText(&ctx))
+	if (!as->compile_from_text(&ctx))
 		return false;
 	fs::path folder("outbin");
 	std::filesystem::path filename = ctx.filename;
@@ -58,7 +57,7 @@ bool Preprocess(const std::filesystem::path *fPath)
 		printf("unable to write to this directory");
 		return false;
 	}
-	binfile.write(as.assembled_binary, as.assembled_binary_size);
+	binfile.write(as->assembled_binary, as->assembled_binary_size);
 	binfile.close();
 	return true;
 }
@@ -74,12 +73,31 @@ int main(int argc, char** argv)
     
     for( const auto & entry : std::filesystem::directory_iterator( "DT30" ) )
     {
-        bool succ = ParseBinary(&entry.path());
+
+		if(entry.path().filename() == "ASMAG000._DT")
+		{
+			asmag mag;
+			bool succ = ParseBinaryAniscript(&entry.path(), &mag);
+		}
+		else
+		{
+			aniscript as;
+        	bool succ = ParseBinaryAniscript(&entry.path(), &as);
+		}
     }
 	printf("completed processing binaries\n");
 	for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
     {
-        bool succ = Preprocess(&entry.path());
+		if(entry.path().filename() == "ASMAG000.as")
+		{
+			asmag mag;
+			bool succ = ParseText(&entry.path(), &mag);
+		}
+		else
+		{
+			aniscript as;
+        	bool succ = ParseText(&entry.path(), &as);
+		}
     }
     auto t2 = high_resolution_clock::now();
 

@@ -1,7 +1,7 @@
 #include "../as_instruction.h"
 #include "../aniscript.h"
 
-instruction instruction::first_pass_binary(binary_context *const ctx, aniscript* const ani)
+instruction instruction::first_pass_binary(binary_context *const ctx, base_aniscript* const ani)
 {
 #define b ctx->u8()
 #define s ctx->u16()
@@ -251,15 +251,18 @@ instruction instruction::first_pass_binary(binary_context *const ctx, aniscript*
 	case 0x45:
 		ctx->position += as_45::size;
 		return instr;
-	case 0x46:
-		ctx->position += as_46::size;
-		return instr;
-	case 0x47:
-		ctx->position += as_47::size;
-		return instr;
-	case 0x48:
-		ctx->position += as_48::size;
-		return instr;
+	case 0x46:{
+		uint8 target = b; uint32 op2 = i; uint32 op3 = i;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x47:{
+		uint8 target = b;
+		ani->targets_in_file.insert(target);
+		return instr;}
+	case 0x48:{
+		uint8 target = b; uint32 op2 = i;
+		ani->targets_in_file.insert(target);
+		return instr;}
 	case 0x49:
 		ctx->position += set_control::size;
 		return instr;

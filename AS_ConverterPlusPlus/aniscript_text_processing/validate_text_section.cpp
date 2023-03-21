@@ -19,10 +19,6 @@ bool aniscript::validate_text_line(std::list<string>::iterator &line, size_t &cu
 		has_errors = true;
 	}
 	has_errors |= instructions[cur_offset_copy].opcode == 0xFF;
-	if(has_errors)
-	{
-		bool foo = true;
-	}
 	return has_errors;
 }
 
@@ -34,7 +30,7 @@ bool aniscript::validate_text_section(text_context* const ctx, size_t& cur_offse
 	boost::smatch what;
 	static const boost::regex label_pattern("[ \\t]*([\\w_]+)[ \\t]*:[ \\t]*");
 	while (text_section_copy != chip_section && text_section_copy != bones_3d_section
-		&& text_section_copy != unk_bytes_section && text_section_copy != model_3d_section && text_section_copy != ctx->lines.end())
+		&& text_section_copy != sprite_offsets_section && text_section_copy != model_3d_section && text_section_copy != ctx->lines.end())
 	{
 		if (text_section_copy->find_first_not_of(" \t") == string::npos)
 		{

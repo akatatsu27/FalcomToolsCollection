@@ -63,7 +63,8 @@ bool aniscript::validate_bones_section(text_context* const ctx, size_t& cur_offs
     bool parsed_unk00 = false;
 	auto bones_3d_section_copy = bones_3d_section;
 	bones_3d_section_copy++;
-	while (bones_3d_section_copy != chip_section && bones_3d_section_copy != model_3d_section && bones_3d_section_copy != unk_bytes_section && bones_3d_section_copy != text_section && bones_3d_section_copy != ctx->lines.end())
+	while (bones_3d_section_copy != chip_section && bones_3d_section_copy != model_3d_section
+		&& bones_3d_section_copy != sprite_offsets_section && bones_3d_section_copy != text_section && bones_3d_section_copy != ctx->lines.end())
 	{
 		if (bones_3d_section_copy->find_first_not_of(" \t") == string::npos)
 		{
@@ -130,7 +131,7 @@ bool aniscript::write_binary_bones_section(text_context* const ctx)
 	auto bones_3d_section_copy = bones_3d_section;
 	bones_3d_section_copy++;
 	while (bones_3d_section_copy != chip_section && bones_3d_section_copy != model_3d_section
-		&& bones_3d_section_copy != unk_bytes_section && bones_3d_section_copy != text_section && bones_3d_section_copy != ctx->lines.end())
+		&& bones_3d_section_copy != sprite_offsets_section && bones_3d_section_copy != text_section && bones_3d_section_copy != ctx->lines.end())
 	{
 		if (bones_3d_section_copy->find_first_not_of(" \t") == string::npos)
 		{

@@ -1,9 +1,9 @@
 #include "../aniscript.h"
 
-bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
+bool aniscript::parse_from_binary(binary_context *const ctx, string *text)
 {
-	craft_offset_table_offset = ctx->u16();
-	craft_offset_table_offset_end = ctx->u16();
+	event_offset_table_offset = ctx->u16();
+	event_offset_table_offset_end = ctx->u16();
 	bones_3d_offset = ctx->u16();
 	chip_entry entry;
 	do
@@ -24,11 +24,11 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 	do
 	{
 		function_offset_table.push_back(ctx->u16());
-	} while (ctx->position != craft_offset_table_offset_end);
+	} while (ctx->position != event_offset_table_offset_end);
 	for (uint8 i = 0; i < 8; i++)
 	{
-		unk_bytes[i].unk00 = ctx->u8();
-		unk_bytes[i].unk01 = ctx->u8();
+		sprite_offsets[i].horizontal_offset = ctx->u8();
+		sprite_offsets[i].vertical_offset = ctx->u8();
 	}
 	size_t beginOfInstructions = ctx->position;	
 	do
@@ -50,7 +50,7 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 		// in the function_offset_table
 		// search for the current offset in the function_offset table,
 		// and if it exists place a label
-		for (char i = 0; i < function_offset_table.size(); i++)
+		for (int i = 0; i < function_offset_table.size(); i++)
 		{
 			if (function_offset_table[i] == instr.offset)
 			{
@@ -100,14 +100,14 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 	}
 	text->append("%macro subchip_update 3\nselect_sub_chip $1, $2\nsleep $3\nupdate\n%endmacro\n");
 	text->append("section chip_entries:\n");
-	for (uint8 i = 0; i < chip_entries.size(); i++)
+	for (int i = 0; i < chip_entries.size(); i++)
 	{
 		chip_entry chp = chip_entries[i];
 		snprintf(buffer.data(), buffer.size(), "chip%d:\nDW 0x%04X, 0x%04X\nDW 0x%04X, 0x%04X\n", i, chp.ch.index, chp.ch.datatable, chp.cp.index, chp.cp.datatable);
 		text->append(&buffer[0]);
 	}
 	text->append("section model_3d:\n");
-	for (uint8 i = 0; i < model_3d.size(); i++)
+	for (int i = 0; i < model_3d.size(); i++)
 	{
 		text->append("DB \"");
 		text->append(model_3d[i]);
@@ -126,10 +126,10 @@ bool aniscript::ParseFromBinary(binary_context *const ctx, string *text)
 			text->append("\"\n");
 		}
 	}
-	text->append("section unk_bytes:\n");
+	text->append("section sprite_offsets:\n");
 	for (uint8 i = 0; i < 8; i++)
 	{
-		snprintf(buffer.data(), buffer.size(), "DB 0x%02X, 0x%02X\n", unk_bytes[i].unk00, unk_bytes[i].unk01);
+		snprintf(buffer.data(), buffer.size(), "DB 0x%02X, 0x%02X\n", sprite_offsets[i].horizontal_offset, sprite_offsets[i].vertical_offset);
 		text->append(buffer.data());
 	}
 	text->append("section text:\n");

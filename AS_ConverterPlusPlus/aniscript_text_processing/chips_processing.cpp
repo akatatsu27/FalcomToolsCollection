@@ -43,7 +43,8 @@ bool aniscript::validate_chips_section(text_context* const ctx, size_t& cur_offs
 	bool has_errors = false;
 	chip_section_copy++;
 	size_t cur_offset_copy = cur_offset;
-	while (chip_section_copy != model_3d_section && chip_section_copy != bones_3d_section && chip_section_copy != unk_bytes_section && chip_section_copy != text_section && chip_section_copy != ctx->lines.end())
+	while (chip_section_copy != model_3d_section && chip_section_copy != bones_3d_section
+		&& chip_section_copy != sprite_offsets_section && chip_section_copy != text_section && chip_section_copy != ctx->lines.end())
 	{
 		if (chip_section_copy->find_first_not_of(" \t") == string::npos)
 		{
@@ -113,7 +114,7 @@ bool aniscript::write_binary_chips_section(text_context* const ctx)
 	chip_section_copy++;
 	size_t cur_offset_copy = cur_offset;
 	while (chip_section_copy != model_3d_section && chip_section_copy != bones_3d_section
-		&& chip_section_copy != unk_bytes_section && chip_section_copy != text_section && chip_section_copy != ctx->lines.end())
+		&& chip_section_copy != sprite_offsets_section && chip_section_copy != text_section && chip_section_copy != ctx->lines.end())
 	{
 		if (chip_section_copy->find_first_not_of(" \t") == string::npos)
 		{

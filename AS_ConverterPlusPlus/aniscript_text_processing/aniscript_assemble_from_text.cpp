@@ -1,10 +1,10 @@
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex.hpp>
 #include <unordered_set>
-#include "aniscript.h"
-#include "parse_assembly_line.h"
+#include "../aniscript.h"
+#include "../parse_assembly_line.h"
 
-bool aniscript::CompileFromText(text_context *const ctx)
+bool aniscript::compile_from_text(text_context *const ctx)
 {
 	printf("[INFO] %ls:\n\tassembling binary...\n", ctx->filename.c_str());
 	bool has_errors = false;
@@ -58,9 +58,9 @@ bool aniscript::CompileFromText(text_context *const ctx)
 		printf("[ERROR] %ls:\n\tmissing \"bones_3d\" section\n", ctx->filename.c_str());
 		has_errors = true;
 	}
-	if (!sections.unk_bytes)
+	if (!sections.sprite_offsets)
 	{
-		printf("[ERROR] %ls:\n\tmissing \"unk_bytes\" section\n", ctx->filename.c_str());
+		printf("[ERROR] %ls:\n\tmissing \"sprite_offsets\" section\n", ctx->filename.c_str());
 		has_errors = true;
 	}
 	if (!sections.text)
@@ -72,7 +72,7 @@ bool aniscript::CompileFromText(text_context *const ctx)
 	for(int i =0; i < MANDATORY_EVENT_LABELS; i++)
 	{
 		if (found_event_label[i]) continue;
-		printf("[ERROR] %ls:\n\tmissing mandatory event_function labels:\n", ctx->filename.c_str());
+		printf("[ERROR] %ls:\n\tmissing mandatory event_function label(s):\n", ctx->filename.c_str());
 		for (char j = 0; j < MANDATORY_EVENT_LABELS; j++)
 		{
 			if (!found_event_label[j])
@@ -81,6 +81,7 @@ bool aniscript::CompileFromText(text_context *const ctx)
 			}
 		}
 		has_errors = true;
+		break;
 	}
 	//check for missing "extra" events in-between "extra" events
 	char event_label_num = 30;
@@ -115,13 +116,13 @@ bool aniscript::CompileFromText(text_context *const ctx)
 	{
 		bones_3d_offset = cur_offset_copy;
 	}
-	craft_offset_table_offset = cur_offset;
+	event_offset_table_offset = cur_offset;
 	cur_offset += 2 * event_funct_count;
-	craft_offset_table_offset_end = cur_offset;
-	has_errors |= validate_unk_bytes_section(ctx, cur_offset);
+	event_offset_table_offset_end = cur_offset;
+	has_errors |= validate_sprite_offsets_section(ctx, cur_offset);
 	has_errors |= validate_text_section(ctx, cur_offset);
 	if(has_errors) return false;
-	if(cur_offset > 0xFFFF)
+	if(cur_offset > 0x4E20) //hardcoded limit. otherwise buffer overflow. you don't want that, right?
 	{
 		printf("[ERROR] %ls:\n\tresulting binary is too big! (0x%04X bytes)\n", ctx->filename.c_str(), cur_offset);
 		return false;
@@ -131,8 +132,8 @@ bool aniscript::CompileFromText(text_context *const ctx)
 	assembled_binary_size = cur_offset;
 	cur_offset = 0;
 	assembled_binary = new char[assembled_binary_size];
-	u16(craft_offset_table_offset);
-	u16(craft_offset_table_offset_end);
+	u16(event_offset_table_offset);
+	u16(event_offset_table_offset_end);
 	u16(bones_3d_offset);
 	has_errors |= write_binary_chips_section(ctx);
 	has_errors |= write_binary_model_section(ctx);
@@ -141,7 +142,7 @@ bool aniscript::CompileFromText(text_context *const ctx)
 	{
 		u16(event_label_offsets[i]);
 	}
-	has_errors |= write_binary_unk_bytes_section(ctx);
+	has_errors |= write_binary_sprite_offsets_section(ctx);
 	for(auto instr : instructions)
 	{
 		has_errors |= instr.second.second_pass_text(this);

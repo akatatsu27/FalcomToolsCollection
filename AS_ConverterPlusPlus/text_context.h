@@ -32,6 +32,15 @@ private:
 				continue;
 			}
 
+        	if(nextOriginal + original.size() < content.size())
+        	{
+				char next_char = content.at(nextOriginal + original.size());
+	    		if(!isblank(next_char) && next_char != ',')
+		    	{
+        		    pos += original.size();
+    		       	continue;
+			    }
+        	}
 			// Actually replace original with replacement
 			content.replace(nextOriginal, original.size(), replacement);
 			pos += replacement.size() + 1;

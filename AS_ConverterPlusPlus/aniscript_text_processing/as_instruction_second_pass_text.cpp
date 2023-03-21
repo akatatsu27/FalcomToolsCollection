@@ -3,7 +3,7 @@
 #include "../parse_assembly_line.h"
 #include <boost/range/algorithm/count.hpp>
 
-bool instruction::second_pass_text(aniscript* const ani)
+bool instruction::second_pass_text(base_aniscript* const ani)
 {
 	auto u8 = [&](uint8 val) {ani->u8(val);};
 	auto u16 = [&](uint16 val) {ani->u16(val);};

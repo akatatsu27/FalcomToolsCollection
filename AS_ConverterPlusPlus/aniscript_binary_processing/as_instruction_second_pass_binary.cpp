@@ -329,16 +329,19 @@ void instruction::second_pass_binary(binary_context* const ctx, string* const te
         sprintf(&buffer[0], "%s 0x%02X, 0x%08X\n", as_45::name, op1, op2);
         txt return;}
     case 0x46:{
-        uint8 op1 = b; uint32 op2 = i; uint32 op3 = i;
-        sprintf(&buffer[0], "%s 0x%02X, 0x%08X, 0x%08X\n", as_46::name, op1, op2, op3);
+        uint8 target = b; uint32 op2 = i; uint32 op3 = i;
+        const char* const target_name = instruction::get_target_name(target);
+        sprintf(&buffer[0], "%s %s, 0x%08X, 0x%08X\n", as_46::name, target_name, op2, op3);
         txt return;}
     case 0x47:{
-        uint8 op1 = b;
-        sprintf(&buffer[0], "%s 0x%02X\n", as_47::name, op1);
+        uint8 target = b;
+        const char* const target_name = instruction::get_target_name(target);
+        sprintf(&buffer[0], "%s %s\n", as_47::name, target_name);
         txt return;}
     case 0x48:{
-        uint8 op1 = b; uint32 op2 = i;
-        sprintf(&buffer[0], "%s 0x%02X, 0x%08X\n", as_48::name, op1, op2);
+        uint8 target = b; uint32 op2 = i;
+        const char* const target_name = instruction::get_target_name(target);
+        sprintf(&buffer[0], "%s %s, 0x%08X\n", as_48::name, target_name, op2);
         txt return;}
     case 0x49:{
         uint8 op1 = b; uint16 op2 = s;

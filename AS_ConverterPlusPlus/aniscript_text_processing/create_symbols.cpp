@@ -39,9 +39,9 @@ void aniscript::new_section(text_context *const ctx, string label_name, std::lis
 		bones_3d_section = line;
 		sections.bones = true;
 		break;
-	case instruction::hash("unk_bytes"):
-		unk_bytes_section = line;
-		sections.unk_bytes = true;
+	case instruction::hash("sprite_offsets"):
+		sprite_offsets_section = line;
+		sections.sprite_offsets = true;
 		break;
 	case instruction::hash("text"):
 		text_section = line;
