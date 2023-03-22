@@ -1,0 +1,63 @@
+Trails in the Sky the 3rd Combat Animation Scripts:
+These files are used to control animations, effects, and other visual aspects of battles.
+They are split into 4 categories. character animation scripts, item animations scripts (ASITEM),
+arts animations (ASMAG000) and (unconfirmed) battle animation scripts (BS____ files).
+
+Let's start with the simple files. ASMAG000 and ASITEM and BS. drag and drop each file onto the executable, and you'll
+notice that a new file with extension ".as" has been created in the "out" folder. For those familiar with assembly language, you'll notice that the format is quite similar (by my design).
+Falcom has developed their own scripting language specifically for battles. There are over 170 different instructions,
+but the meaning of the most used ones has already been deciphered. It is highly recommended to take a look at the
+accompanying (incomplete) instruction set documentation.
+At the top of each file you may see statements like "#define self 0xFF". These are preprocessor directives to make manipulating
+these files easier and more user friendly. You are free to define your own, and the preprocessor will handle them.
+After that, you will see the line "section text:", and in ASMAG000 and ASITEM there is also the line "section super_special_section:".
+These denote regions of the original binary, and for convenience may appear in any order in the .as files.
+Furthermore, on top of sections, there are labels such as "loc05FA:", which denote a position that another instruction such as go_to may refer to,
+but each type of file also has its own special labels (names of each label subject to change). In particular ASMAG000 has "OnMagXX" labels,
+which mark the start of functions that are called when a particular art is invoked, ASITEM has "OnItemXX" for when a particular
+item is used, and BS files have "OnBS0{0,1,2}", however their purpose is unknown.
+To recompile the scripts, simply drag and drop the ".as" (or its parent folder) onto the executable, and the newly compiled binary will be in the "outbin" folder.
+As for editing, you may use any number format supported by https://en.cppreference.com/w/cpp/string/basic_string/stoul ,
+but also keep in mind the size of each operand as specified in the documentation. Worry not though,
+as whenever your script is ill-formed, compilation will fail, and relevant error messages will be displayed in the console.
+
+Now lets take a look at the more interesting and complicated files. The character animation scripts.
+On top of each file you will notice the following snippet:
+
+	%macro subchip_update 3
+	select_sub_chip $1, $2
+	sleep $3
+	update
+	%endmacro
+
+This is an assembly style macro, that is used to reduce the file length and make the script more readable. As with #define directives,
+you are free to define your own macros to suit your needs.
+A note about the preprocessor directives: The current implementation doesn't directly support nested macros and #defines. Each directive is
+resolved as it appears in the file, meaning it applies only once to every line that appears after it, or in the case of #define, until a matching
+#undef directive, or the end of the file.
+
+Continuing with the character scripts, there are 4 new sections: chip_entries, model_3d, bones_3d, and sprite_offsets.
+chip_entries:
+This section defines pairs of .ch and .cp files via the archive number (0x0007 in all cases) and the .dir index in that archive.
+A combination of DB and DW statements may be used, but the final size of the section must be a multiple of 8 bytes (1 full sprite), or the section may be empty.
+
+model_3d:
+This section defines filenames for the 3d models used for this character; usually a boss. It is non-empty only in the 
+AS files with id bigger than 30000 (eg. AS32200). any number of file names may be specified, however the resulting behaviour
+has not been investigated.
+
+bones_3d:
+This section defines "bones" that will be used by a 3d model. As such, it non-empty only when the model_3d section isn't empty.
+The first statement in this section must always be a DB statement. possible values and purpose unknown.
+The next statements may be any number of strings, however, what counts as valid values is unknown.
+
+sprite_offsets:
+This section defines screen-space horizontal and vertical offsets from the physical location of the character
+for each of the 8 view angles. Most normal-sized characters have the values 0x80 and 0xB0 for the horizontal and vertical offsets respectively,
+which would match with the physical location of the character. for bigger or flying enemies, there may be different values.
+The effect is purely visual, so feel free to experiment with different values. This section is mandatory, even if no chip_entries are specified.
+
+and finally, text:
+As with the other types of scripts, this section contains instructions, and similarly it has its own special labels.
+There's 30 mandatory "event" labels, but some files may contain up to 34 of these special labels. Each special label marks the beginning
+of a function that is called when a certain combat event happens, like a normal attack, casting an art, moving, using an item, etc.
