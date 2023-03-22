@@ -8,7 +8,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-std=c++17",
-                //"-O3",
+                "-O3",
                 "aniscript_binary_processing\\*.cpp",
                 "aniscript_text_processing\\*.cpp",
                 "asmag_processing\\*.cpp",

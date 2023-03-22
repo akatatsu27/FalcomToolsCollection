@@ -23,7 +23,8 @@ bool ParseBinaryAniscript(const std::filesystem::path *fPath, base_aniscript* co
 		printf("%ls:\n\ttried to read outside the bounds of the file\n", fPath->c_str());
 	}
 
-	fs::path folder("out");
+    std::filesystem::path folder("out");
+	std::filesystem::create_directory(folder);
 	std::filesystem::path filename = ctx.filename;
 	fs::path extension(".as");
 	filename.replace_extension(extension);
@@ -37,6 +38,9 @@ bool ParseBinaryAniscript(const std::filesystem::path *fPath, base_aniscript* co
 	}
 	txtfile.write(text.data(), text.size());
 	txtfile.close();
+	printf("Successfully parsed file ");
+	wprintf(fPath->c_str());
+	printf("\n");
 	return true;
 }
 bool ParseText(const std::filesystem::path *fPath, base_aniscript* as)
@@ -47,7 +51,8 @@ bool ParseText(const std::filesystem::path *fPath, base_aniscript* as)
 		return false;
 	if (!as->compile_from_text(&ctx))
 		return false;
-	fs::path folder("outbin");
+    std::filesystem::path folder("outbin");
+	std::filesystem::create_directory(folder);
 	std::filesystem::path filename = ctx.filename;
 	fs::path extension("._DT");
 	filename.replace_extension(extension);
@@ -61,76 +66,98 @@ bool ParseText(const std::filesystem::path *fPath, base_aniscript* as)
 	}
 	binfile.write(as->assembled_binary, as->assembled_binary_size);
 	binfile.close();
+	printf("Successfully assembled file ");
+	wprintf(fPath->c_str());
+	printf("\n");
 	return true;
 }
+
+void decide(const std::filesystem::path *fPath)
+{
+	//is the file ".as" or "._DT"?
+	if(!fPath->has_extension())
+	{
+		return;
+	}
+	else if(fPath->extension() == "._DT")
+	{
+		if(fPath->filename() == L"ASMAG000._DT")
+		{
+			asmag mag;
+			bool succ = ParseBinaryAniscript(fPath, &mag);
+		}
+		else if(fPath->filename() == L"ASITEM  ._DT")
+		{
+			asitem item;
+			bool succ = ParseBinaryAniscript(fPath, &item);
+		}
+		else if (!wcsncmp(fPath->filename().c_str(), L"AS", 2))
+		{
+			aniscript as;
+        	bool succ = ParseBinaryAniscript(fPath, &as);
+		}
+		else if (!wcsncmp(fPath->filename().c_str(), L"BS", 2))
+		{
+			asbs bs;
+			bool succ = ParseBinaryAniscript(fPath, &bs);
+		}
+	}
+	else if(fPath->extension() == ".as")
+	{
+		if(fPath->filename() == L"ASMAG000.as")
+		{
+			asmag mag;
+			bool succ = ParseText(fPath, &mag);
+		}
+		else if(fPath->filename() == L"ASITEM  .as")
+		{
+			asitem item;
+			bool succ = ParseText(fPath, &item);
+		}
+		else if (!wcsncmp(fPath->filename().c_str(), L"AS", 2))
+		{
+			aniscript as;
+        	bool succ = ParseText(fPath, &as);
+		}
+		else if (!wcsncmp(fPath->filename().c_str(), L"BS", 2))
+		{
+			asbs bs;
+			bool succ = ParseText(fPath, &bs);
+		}
+	}
+	return;
+}
+
 int main(int argc, char** argv)
 {    
-	using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
-	auto t1 = high_resolution_clock::now();
-    std::filesystem::path folder("out");
-	std::filesystem::create_directory(folder);
-    
-    for( const auto & entry : std::filesystem::directory_iterator( "DT30" ) )
+    if(argc <= 1)
     {
-
-		if(entry.path().filename() == L"ASMAG000._DT")
-		{
-			asmag mag;
-			bool succ = ParseBinaryAniscript(&entry.path(), &mag);
-		}
-		else if(entry.path().filename() == L"ASITEM  ._DT")
-		{
-			asitem item;
-			bool succ = ParseBinaryAniscript(&entry.path(), &item);
-		}
-		else if (!wcsncmp(entry.path().filename().c_str(), L"AS", 2))
-		{
-			aniscript as;
-        	bool succ = ParseBinaryAniscript(&entry.path(), &as);
-		}
-		else if (!wcsncmp(entry.path().filename().c_str(), L"BS", 2))
-		{
-			asbs bs;
-			bool succ = ParseBinaryAniscript(&entry.path(), &bs);
-		}
+        printf("AS_Converter version 1.42069\nUsage:\n\tAS_converter.exe [Directory/File]");
+        return 0;
     }
-	printf("completed processing binaries\n");
-	for( const auto & entry : std::filesystem::directory_iterator( "out" ) )
+    std::filesystem::path path(argv[1]);
+    std::error_code ec;
+    if(std::filesystem::is_directory(path, ec))
     {
-		if(entry.path().filename() == L"ASMAG000.as")
-		{
-			asmag mag;
-			bool succ = ParseText(&entry.path(), &mag);
-		}
-		else if(entry.path().filename() == L"ASITEM  .as")
-		{
-			asitem item;
-			bool succ = ParseText(&entry.path(), &item);
-		}
-		else if (!wcsncmp(entry.path().filename().c_str(), L"AS", 2))
-		{
-			aniscript as;
-        	bool succ = ParseText(&entry.path(), &as);
-		}
-		else if (!wcsncmp(entry.path().filename().c_str(), L"BS", 2))
-		{
-			asbs bs;
-			bool succ = ParseText(&entry.path(), &bs);
-		}
+        for(auto & entry : std::filesystem::directory_iterator(path))
+    	{
+			decide(&entry.path());
+    	}
     }
-    auto t2 = high_resolution_clock::now();
-
-    /* Getting number of milliseconds as an integer. */
-    auto ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    /* Getting number of milliseconds as a double. */
-    duration<double, std::milli> ms_double = t2 - t1;
-
-    std::cout << ms_int.count() << "ms\n";
-    std::cout << ms_double.count() << "ms\n";
+    else if (std::filesystem::is_regular_file(path, ec))
+    {
+		decide(&path);
+    }
+    else
+    {
+        //if(ec)
+        //{
+        //    
+        //}
+        //else
+        //    printf("wut");
+		printf("[ERROR] Input was not a file or directory");
+    }
 
     return EXIT_SUCCESS;
 }
