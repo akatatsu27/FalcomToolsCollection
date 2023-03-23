@@ -1,0 +1,752 @@
+AS_Converter Trails in the Sky Instruction set and specification. Names subject to change.
+Opcodes when bigger than 8 bits are written in big endian order. eg. 0xA402, 0xA401, the 0xA4 appears first in the binary, then the 0x02/0x01.
+Operands are listed in the same order as they would be in the binary representation.
+The '|' in the operand name denotes the size of the operand. A number is the size in bits, str means a null terminated string,
+and strarr means an array of null terminated strings, terminated by null. eg. label|16, target|8, text|str, phrases|strarr
+	
+end_event:
+	Opcode: 0x00
+	Operands: No operands
+	Description: Signals to the game engine that the currently executing event (eg. normal attack) has finished.
+go_to:
+	Opcode: 0x01
+    Operands: label|16
+    Description: unconditional jump to the specified label.
+select_sub_chip:
+	Opcode: 0x02
+	Operands: target|8 number|8
+	Description: select the {number} sub_chip from the current chip for the {target}
+deg:
+	Opcode: 0x03
+	Operands: target|8 op2|16
+	Description:
+as_04:
+	Opcode: 0x04
+	Operands: target|8 op2|8 op3|16
+	Description:
+as_05:
+	Opcode: 0x05
+	Operands: op1|8 op2|8 op3|32
+	Description:
+sleep:
+	Opcode: 0x06
+	Operands: timespan|32
+	Description: blocks current thread of executing for {timespan} milliseconds
+update:
+	Opcode: 0x07
+	Operands: No operands
+	Description: update the visuals with whatever was last changed (eg. sub_chip)
+teleport:
+	Opcode: 0x08
+	Operands: target1|8 target2|8 op3|32 op4|32 op5|32
+	Description:
+as_09:
+	Opcode: 0x09
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|32
+	Description:
+as_0a:
+	Opcode: 0x0A
+	Operands: op1|8 op2|8 op3|8 op4|32
+	Description:
+turn:
+	Opcode: 0x0B
+	Operands: target|8 op2|8 op3|16
+	Description:
+as_0c:
+	Opcode: 0x0C
+	Operands: op1|8 op2|8 op3|16 op4|16 op5|8
+	Description:
+jump:
+	Opcode: 0x0D
+	Operands: target1|8 target2|8 op3|32 op4|32 op5|32 op6|16 op7|16
+	Description:
+drop_down:
+	Opcode: 0x0E
+	Operands: op1|8 op2|32 op3|32 op4|32 op5|16 op6|16
+	Description:
+jump_to_target:
+	Opcode: 0x0F
+	Operands: op1|16 op2|16
+	Description:
+jump_back:
+	Opcode: 0x10
+	Operands: op1|16 op2|16
+	Description:
+move:
+	Opcode: 0x11
+	Operands: target|8 op2|8 op3|32 op4|32 op5|32 op6|32 op7|8
+	Description:
+add_effect:
+	Opcode: 0x12
+	Operands: op1|16 filename|str
+	Description:
+release_effect:
+	Opcode: 0x13
+	Operands: op1|16
+	Description:
+as_14:
+	Opcode: 0x14
+	Operands: op1|16
+	Description:
+wait_effect:
+	Opcode: 0x15
+	Operands: target|8 op2|8
+	Description:
+finish_effect:
+	Opcode: 0x16
+	Operands: target|8 op2|8
+	Description:
+cancel_effect:
+	Opcode: 0x17
+	Operands: target|8 op2|8
+	Description:
+show_effect:
+	Opcode: 0x18
+	Operands: op1|8 op2|8 target|8 op4|16 op5|32 op6|32 op7|32 op8|16 op9|16 op10|16 op11|16 op12|16 op13|16 op14|8
+	Description:
+show_3d_effect:
+	Opcode: 0x19
+	Operands: op1|8 op2|8 op3|str op4|16 op5|32 op6|32 op7|32 op8|16 op9|16 op10|16 op11|16 op12|16 op13|16 op14|8
+	Description:
+as_1a:
+	Opcode: 0x1A
+	Operands: op1|8 op2|16
+	Description:
+select_chip:
+	Opcode: 0x1B
+	Operands: target|8 chip_number|8
+	Description:
+damage:
+	Opcode: 0x1C
+	Operands: op1|8
+	Description:
+damage_anime:
+	Opcode: 0x1D
+	Operands: op1|8 op2|8 op3|32
+	Description:
+as_1e:
+	Opcode: 0x1E
+	Operands: op1|32
+	Description:
+as_1f:
+	Opcode: 0x1F
+	Operands: op1|16 op2|16 op3|8
+	Description:
+as_20:
+	Opcode: 0x20
+	Operands: op1|8 op2|8 op3|8 op4|8 op5|32 op6|32
+	Description:
+as_21:
+	Opcode: 0x21
+	Operands: op1|8 op2|8 op3|32 op4|32
+	Description:
+begin_thread:
+	Opcode: 0x22
+	Operands: target|8 op2|8 label|16 op4|8
+	Description:
+wait_thread:
+	Opcode: 0x23
+	Operands: target|8 op2|8
+	Description:
+set_chip_mode_flag:
+	Opcode: 0x24
+	Operands: op1|8 target|8 op3|16
+	Description:
+clear_chip_mode_flag:
+	Opcode: 0x25
+	Operands: op1|8 target|8 op3|16
+	Description:
+as_26:
+	Opcode: 0x26
+	Operands: op1|8 op2|8 op3|16
+	Description:
+as_27:
+	Opcode: 0x27
+	Operands: op1|8 op2|8 op3|16
+	Description:
+char_say:
+	Opcode: 0x28
+	Operands: op1|8 phrase|str op3|32
+	Description:
+as_29:
+	Opcode: 0x29
+	Operands: op1|8
+	Description:
+tip_text:
+	Opcode: 0x2A
+	Operands: text|str op2|32
+	Description:
+as_2b: 
+    Opcode: 0x2B
+	Operands: No operands
+	Description:
+shadow_begin:
+	Opcode: 0x2C
+	Operands: target|8 op2|16 op3|16
+	Description:
+shadow_end:
+	Opcode: 0x2D
+	Operands: target|8
+	Description:
+shake_char:
+	Opcode: 0x2E
+	Operands: target|8 op2|32 op3|32 op4|32
+	Description:
+suspend_thread:
+	Opcode: 0x2F
+	Operands: op1|8 op2|8
+	Description:
+char_say_random:
+	Opcode: 0x30
+	Operands: number_of_phrases|8 phrases|strarr
+	Description: The character will say in a text box a random phrase from phrases.
+		if number_of_phrases is bigger than the number of phrases, the behaviour is undefined.
+as_31:
+	Opcode: 0x31
+	Operands:
+	Description:
+        uint8 op1 = b; uint32 op2 = i;
+        sprintf(&buffer[0], "%s 0x%02X, 0x%08X\n", ::name, op1, op2);
+as_32:
+	Opcode: 0x32
+	Operands: op1|8 op2|8
+	Description:
+as_33:
+	Opcode: 0x33
+	Operands: op1|8 op2|8
+	Description:
+as_34:
+	Opcode: 0x34
+	Operands: No operands
+	Description:
+keep_angle:
+	Opcode: 0x35
+	Operands: op1|8 op2|32 op3|32 op4|32 op5|32
+	Description:
+as_36:
+	Opcode: 0x36
+	Operands: op1|32 op2|32 op3|32 op4|32
+	Description:
+rotation_angle:
+	Opcode: 0x37
+	Operands: op1|32 op2|32 op3|32 op4|32
+	Description:
+rotation_angle_v:
+	Opcode: 0x38
+	Operands: op1|32 op2|32 op3|32 op4|32
+	Description:
+set_angle:
+	Opcode: 0x39
+	Operands: op1|32 op2|32
+	Description:
+tilt_angle:
+	Opcode: 0x3A
+	Operands: op1|32 op2|32
+	Description:
+rotation_angle_h:
+	Opcode: 0x3B
+	Operands: op1|32 op2|32
+	Description:
+as_3c:
+	Opcode: 0x3C
+	Operands: op1|16 op2|32
+	Description:
+shake_screen:
+	Opcode: 0x3D
+	Operands: op1|32 op2|32 op3|32 op4|32
+	Description:
+ as_3e:
+	Opcode: 0x3E
+	Operands: op1|32 op2|32
+	Description:
+as_3f:
+	Opcode: 0x3F
+	Operands: op1|8
+	Description:
+as_40:
+	Opcode: 0x40
+	Operands: op1|8
+	Description:
+lock_angle:
+	Opcode: 0x41
+	Operands: target|8
+	Description:
+as_42:
+	Opcode: 0x42
+	Operands: op1|8 op2|32 op3|8
+	Description:
+set_bk_color:
+	Opcode: 0x43
+	Operands: op1|8 op2|32 op3|32
+	Description:
+zoom_angle:
+	Opcode: 0x44
+	Operands: op1|8 op2|32 op3|32
+	Description:
+as_45:
+	Opcode: 0x45
+	Operands: op1|8 op2|32
+	Description:
+as_46:
+	Opcode: 0x46
+	Operands: target|8 op2|32 op3|32
+	Description:
+as_47:
+	Opcode: 0x47
+	Operands: target|8
+	Description:
+as_48:
+	Opcode: 0x48
+	Operands: target|8 op2|32
+	Description:
+set_control:
+	Opcode: 0x49
+	Operands: op1|8 op2|16
+	Description:
+as_4a:
+	Opcode: 0x4A
+	Operands: op1|8
+	Description:
+random:
+	Opcode: 0x4B
+	Operands: op1|8 op2|8 op3|32 label|16
+	Description:
+loop_target_beg:
+	Opcode: 0x4C
+	Operands: label|16
+	Description:
+reset_loop_target:
+	Opcode: 0x4D
+	Operands: No operands
+	Description:
+loop_target_end:
+	Opcode: 0x4E
+	Operands: No operands
+	Description:
+as_4f:
+	Opcode: 0x4F
+	Operands: op1|8 op2|8
+	Description:
+call:
+	Opcode: 0x50
+	Operands: label|16
+	Description: Call a subroutine that starts at the given label
+ret:
+	Opcode: 0x51
+	Operands: No operands
+	Description: Return from subroutine. Does not end the current "event".
+as_52:
+	Opcode: 0x52
+	Operands: op1|8
+	Description:
+as_53:
+	Opcode: 0x53
+	Operands: op1|8
+	Description:
+as_54:
+	Opcode: 0x54
+	Operands: op1|8
+	Description:
+magic_cast_begin:
+	Opcode: 0x55
+	Operands: op1|16
+	Description: Execution will continue in a function in ASMAG000._DT, until an end_event instruction is encountered,
+		after which, execution continues from the instruction after this one (usually a magic_cast_end).
+magic_cast_end:
+	Opcode: 0x56
+	Operands: No operands
+	Description: Marks the end of a cast animation
+as_57:
+	Opcode: 0x57
+	Operands: op1|8 op2|8
+	Description:
+beat_back:
+	Opcode: 0x58
+	Operands: op1|8
+	Description:
+as_59:
+	Opcode: 0x59
+	Operands: op1|8 op2|16
+	Description:
+as_5a:
+	Opcode: 0x5A
+	Operands: op1|8 op2|8 op3|32
+	Description:
+ as_5b:
+	Opcode: 0x5B
+	Operands: op1|32
+	Description:
+show:
+	Opcode: 0x5C
+	Operands: target|8 op2|32
+	Description:
+hide:
+	Opcode: 0x5D
+	Operands: target|8 op2|32
+	Description:
+as_5e:
+	Opcode: 0x5E
+	Operands: op1|8
+	Description:
+as_5f:
+	Opcode: 0x5F
+	Operands: target|8 op2|8
+	Description:
+as_60:
+	Opcode: 0x60
+	Operands: op1|8
+	Description:
+set_battle_speed:
+	Opcode: 0x61
+	Operands: op1|32
+	Description:
+as_62:
+	Opcode: 0x62
+	Operands: op1|8 op2|8 op3|8 op4|8 op5|16
+	Description:
+as_63:
+	Opcode: 0x63
+	Operands: op1|8 op2|32
+	Description:
+sound_effect:
+	Opcode: 0x64
+	Operands: op1|16
+	Description:
+sound_effect_ex:
+	Opcode: 0x65
+	Operands: op1|16 op2|8
+	Description:
+as_66:
+	Opcode: 0x66
+	Operands: op1|16
+	Description:
+scraft_cut_in:
+	Opcode: 0x67
+	Operands: op1|str
+	Description:
+nop_68:
+	Opcode: 0x68
+	Operands: No operands
+	Description: Does nothing. Simply advanced the instruction pointer by 1 (the size of the opcode).
+release_texture:
+	Opcode: 0x69
+	Operands: No operands
+	Description:
+load_schip:
+	Opcode: 0x6A
+	Operands: op1|8 op2|32 op3|32
+	Description:
+reset_scraft_chip:
+	Opcode: 0x6B
+	Operands: No operands
+	Description:
+die:
+	Opcode: 0x6C
+	Operands: No operands
+	Description:
+as_6d:
+	Opcode: 0x6D
+	Operands: op1|32
+	Description:
+as_6e:
+	Opcode: 0x6E
+	Operands: op1|32
+	Description:
+as_6f:
+	Opcode: 0x6F
+	Operands: op1|8 op2|8
+	Description:
+as_70:
+	Opcode: 0x70
+	Operands: op1|8 op2|8 op3|16 op4|16
+	Description:
+as_71:
+	Opcode: 0x71
+	Operands: op1|8
+	Description:
+as_72:
+	Opcode: 0x72
+	Operands: No operands
+	Description:
+as_73:
+	Opcode: 0x73
+	Operands: op1|8
+	Description:
+as_74:
+	Opcode: 0x74
+	Operands: op1|8
+	Description:
+as_75:
+	Opcode: 0x75
+	Operands: op1|16
+	Description:
+as_76:
+	Opcode: 0x76
+	Operands: op1|8
+	Description:
+as_77:
+	Opcode: 0x77
+	Operands: op1|8
+	Description:
+set_eff_state:
+	Opcode: 0x78
+	Operands: op1|8
+	Description:
+nop_79:
+	Opcode: 0x79
+	Operands: op1|8
+	Description: Does nothing. Simply advances the instruction pointer 1 + 1 bytes forward.
+craft_end:
+	Opcode: 0x7A
+	Operands: op1|8
+	Description:
+set_craft_end_flag:
+	Opcode: 0x7B
+	Operands: op1|16
+	Description:
+as_7c:
+	Opcode: 0x7C
+	Operands: op1|8 op2|8
+	Description:
+as_7d:
+	Opcode: 0x7D
+	Operands: op1|8 op2|32
+	Description:
+as_7e:
+	Opcode: 0x7E
+	Operands: op1|32
+	Description:
+blur_screen:
+	Opcode: 0x7F
+	Operands: op1|32 op2|32 op3|32 op4|8 op5|32
+	Description:
+as_80:
+	Opcode: 0x80
+	Operands: op1|32
+	Description:
+as_81:
+	Opcode: 0x81
+	Operands: op1|8 op2|8 op3|16
+	Description:
+as_82:
+	Opcode: 0x82
+	Operands: No operands
+	Description:
+sort_target:
+	Opcode: 0x83
+	Operands: op1|8
+	Description:
+rotate_char:
+	Opcode: 0x84
+	Operands: op1|8 op2|16 op3|16 op4|16 op5|32 op6|8
+	Description:
+as_85:
+	Opcode: 0x85
+	Operands: op1|8 op2|8 op3|32
+	Description:
+as_86:
+	Opcode: 0x86
+	Operands: op1|16 op2|16 op3|16 op4|8 op5|32
+	Description:
+as_87:
+	Opcode: 0x87
+	Operands: op1|16 op2|8
+	Description:
+voice:
+	Opcode: 0x88
+	Operands: op1|16
+	Description:
+save_cur_pos:
+	Opcode: 0x89
+	Operands: target|8
+	Description:
+clone:
+	Opcode: 0x8A
+	Operands: op1|8 op2|8
+	Description:
+use_item_begin:
+	Opcode: 0x8B
+	Operands: No operands
+	Description: The item being used is known only by the game engine. Execution continues in the corresponding function
+		in ASITEM ._DT until an end_event instruction is reached, upon which, execution resumes at
+		the instruction after this one (usually use_item_end).
+use_item_end:
+	Opcode: 0x8C
+	Operands: No operands
+	Description: Marks the end of the use of an item.
+zoom:
+	Opcode: 0x8D
+	Operands: op1|8 op2|32 op3|32 op4|32 op5|32
+	Description:
+load_x_file:
+	Opcode: 0x8E01
+	Operands: op1|8 op2|str
+	Description:
+as_8e0d:
+	Opcode: 0x8E0D
+	Operands: op1|8 op2|32 op3|32 op4|32 op5|32 op6|32
+	Description:
+as_8e:
+	Opcode: 0x8E
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|32 op6|32
+	Description:
+as_8f:
+	Opcode: 0x8F
+	Operands: op1|8
+	Description:
+as_90:
+	Opcode: 0x90
+	Operands: op1|8
+	Description:
+as_91:
+	Opcode: 0x91
+	Operands: op1|8
+	Description:
+as_92:
+	Opcode: 0x92
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|32 op6|16 op7|32
+	Description:
+as_93:
+	Opcode: 0x93
+	Operands: op1|8 op2|8 op3|str
+	Description:
+as_94:
+	Opcode: 0x94
+	Operands: op1|8 op2|str op3|32
+	Description:
+as_95:
+	Opcode: 0x95
+	Operands: No operands
+	Description:
+set_angle_target:
+	Opcode: 0x96
+	Operands: target|8 op2|str op3|16
+	Description:
+move_angle:
+	Opcode: 0x97
+	Operands: op1|32 op2|16 op3|16
+	Description:
+as_98:
+	Opcode: 0x98
+	Operands: op1|8 op2|8 op3|32 op4|32
+	Description:
+as_99:
+	Opcode: 0x99
+	Operands: op1|8
+	Description:
+as_9a:
+	Opcode: 0x9A
+	Operands: op1|32
+	Description:
+as_9b:
+	Opcode: 0x9B
+	Operands: op1|8
+	Description:
+reset_chip_status:
+	Opcode: 0x9C
+	Operands: target|8
+	Description:
+as_9d:
+	Opcode: 0x9D
+	Operands: op1|8
+	Description:
+set_timer:
+	Opcode: 0x9E
+	Operands: op1|8
+	Description:
+set_battle_mode:
+	Opcode: 0x9F
+	Operands: op1|8 op2|32
+	Description:
+as_a0:
+	Opcode: 0xA0
+	Operands:
+	Description:
+        uint8 op1 = b; uint32 op2 = i; uint16 op3 = s; char *op4 = str;
+        snprintf(&buffer[0], sizeof(buffer), " 0x%02X, 0x%08X, 0x%04X, \"%s\"\n", op1, op2, op3, op4);
+as_a1:
+	Opcode: 0xA1
+	Operands:
+	Description:
+        uint8 op1 = b; uint32 op2 = i;
+        sprintf(&buffer[0], "%s 0x%02X, 0x%08X\n", ::name, op1, op2);
+as_a2:
+	Opcode: 0xA2
+	Operands: op1|8
+	Description:
+as_a3:
+	Opcode: 0xA3
+	Operands: op1|8 op2|8
+	Description:
+as_a400:
+	Opcode: 0xA400
+	Operands: No operands.
+	Description:
+as_a401:
+	Opcode: 0xA401
+	Operands: No operands.
+	Description:
+as_a402:
+	Opcode: 0xA402
+	Operands: op1|16
+	Description:
+as_a5:
+	Opcode: 0xA5
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|8
+	Description:
+as_a6:
+	Opcode: 0xA6
+	Operands: op1|8 op2|8 op3|8 op4|32 op5|32 op6|32 op7|32
+	Description:
+battle_effect_end:
+	Opcode: 0xA7
+	Operands: op1|8 op2|16
+	Description:
+damage_voice:
+	Opcode: 0xA8
+	Operands: op1|8 op2|8
+	Description:
+nop_a9:
+	Opcode: 0xA9
+	Operands: op1|32
+	Description: Does nothing. simply advances the instruction pointer 1 + 4 bytes forward.
+as_aa:
+	Opcode: 0xAA
+	Operands: op1|32 op2|32
+	Description:
+as_ab:
+	Opcode: 0xAB
+	Operands: op1|8 target|8 op2|8 op3|32
+	Description:
+as_ab00:
+	Opcode: 0xAB00
+	Operands: target|8 op2|8 op3|32
+	Description:
+as_ab01:
+	Opcode: 0xAB01
+	Operands: target|8 op2|8 op3|32
+	Description:
+as_ac:
+	Opcode: 0xAC
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|8
+	Description:
+as_ad:
+	Opcode: 0xAD
+	Operands: op1|8 op2|8 op3|32
+	Description:
+as_ae:
+	Opcode: 0xAE
+	Operands: op1|16 op2|32
+	Description:
+as_af:
+	Opcode: 0xAF
+	Operands: op1|8 op2|8 op3|32 op4|32 op5|32
+	Description:
+as_b0:
+	Opcode: 0xB0
+	Operands: op1|8 op2|16
+	Description:
+as_b1:
+	Opcode: 0xB1
+	Operands: op1|8 op2|16
+	Description:

@@ -121,14 +121,14 @@ void instruction::second_pass_binary(binary_context* const ctx, string* const te
         txt return;}
     case 0x18:{
         uint8 op1 = b; uint8 op2 = b; uint8 target = b; uint16 op4 = s; uint32 op5 = i; uint32 op6 = i; uint32 op7 = i;
-        uint16 op8 = s; uint16 op9 = s; uint16 op10 = s; uint32 op11 = s; uint16 op12 = s; uint32 op13 = s; uint8 op14 = b;
+        uint16 op8 = s; uint16 op9 = s; uint16 op10 = s; uint16 op11 = s; uint16 op12 = s; uint16 op13 = s; uint8 op14 = b;
         const char* const target_name = instruction::get_target_name(target);
         sprintf(&buffer[0], "%s 0x%02X, 0x%02X, %s, 0x%04X, 0x%08X, 0x%08X, 0x%08X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%02X\n",
             show_effect::name, op1, op2, target_name, op4, op5, op6, op7, op8, op9, op10, op11, op12, op13, op14);
         txt return;}
     case 0x19:{
         uint8 op1 = b; uint8 op2 = b; char *op3 = str; uint16 op4 = s; uint32 op5 = i; uint32 op6 = i; uint32 op7 = i;
-        uint16 op8 = s; uint16 op9 = s; uint16 op10 = s; uint32 op11 = s; uint16 op12 = s; uint32 op13 = s; uint8 op14 = b;
+        uint16 op8 = s; uint16 op9 = s; uint16 op10 = s; uint16 op11 = s; uint16 op12 = s; uint16 op13 = s; uint8 op14 = b;
         snprintf(&buffer[0], 500, "show_3d_effect 0x%02X, 0x%02X, \"%s\", 0x%04X, 0x%08X, 0x%08X, 0x%08X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%04X, 0x%02X\n",
          op1, op2, op3, op4, op5, op6, op7, op8, op9, op10, op11, op12, op13, op14);
         txt return;}
