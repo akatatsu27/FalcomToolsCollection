@@ -1,25 +1,28 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text;
-using format_converter;
+using MS_Converter;
 
 internal class Program
 {
     static async Task Main(string[] args)
     {
+        string curDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		Directory.SetCurrentDirectory(curDir);
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         if (!Directory.Exists("./MSJson"))
             Directory.CreateDirectory("./MSJson");
         if (!Directory.Exists("./MSDT"))
             Directory.CreateDirectory("./MSDT");
+#if !DEBUG
         if (args.Length == 0)
         {
-
-            var versionString = Assembly.GetEntryAssembly()?
+            string? versionString = Assembly.GetEntryAssembly()?
                                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
                                     .InformationalVersion
                                     .ToString();
 
-            Console.WriteLine($"format converter v{versionString}");
+            Console.WriteLine($"MS_Converter v{versionString}");
             Console.WriteLine("-------------");
             Console.WriteLine("\nUsage:");
             Console.WriteLine("  <folder or file>");
@@ -60,7 +63,14 @@ internal class Program
         }
         else
         {
-            Console.WriteLine("invalid arguments");
+            Console.WriteLine("Invalid arguments");
+            Console.WriteLine("Press enter to close...");
+			Console.ReadLine();
+			return;
         }
-    }
+#else        
+		await MsFileConverter.ToJsonFromFolderAsync("ED6_DT30");
+		await MsFileConverter.ToDataTableFromFileAsync("MSJson/MS04410 ._DT.json");
+#endif
+	}
 }

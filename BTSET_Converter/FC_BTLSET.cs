@@ -31,9 +31,9 @@ internal class FC_BTLSET : BTLSET
 
 	public async Task Parse(string filePath)
 	{
-		Data = await File.ReadAllBytesAsync(filePath);
-		if (Data.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
-		Coverage = new bool[Data.Length];
+		Bytes = await File.ReadAllBytesAsync(filePath);
+		if (Bytes.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
+		Coverage = new bool[Bytes.Length];
 
 		UInt16 curOffset = 0;
 		BattleEntryTableOffset = ReadUInt16(ref curOffset);

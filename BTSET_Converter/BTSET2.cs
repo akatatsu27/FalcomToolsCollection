@@ -33,9 +33,9 @@ internal class BTSET2 : BTSET
 			}
 		}
 
-		Data = await File.ReadAllBytesAsync(filePath);
-        if (Data.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
-        Coverage = new bool[Data.Length];
+		Bytes = await File.ReadAllBytesAsync(filePath);
+        if (Bytes.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
+        Coverage = new bool[Bytes.Length];
 
 		if (Convert.ToHexString(hash) == "B7423D80515F66413D10E0F4BF3BF7F9") //hack to distinguish between SC and THIRD
 		{

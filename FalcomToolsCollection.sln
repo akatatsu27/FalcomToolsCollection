@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "format_converter", "format_converter\format_converter.csproj", "{AE4AC5BC-6B93-4C73-A57C-75CE7DDBE946}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS_Converter", "MS_Converter\MS_Converter.csproj", "{AE4AC5BC-6B93-4C73-A57C-75CE7DDBE946}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archive_extractor", "archive_extractor\archive_extractor.csproj", "{20ECD08F-E7D5-4AA4-86C4-FDEEE792DCBE}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BTSET_Converter", "BTSET_Co
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AS_Converter", "AS_Converter\AS_Converter.csproj", "{9C673D21-FE59-4358-B400-C945FC8E2A07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T_MAGIC_Converter", "T_MAGIC_Converter\T_MAGIC_Converter.csproj", "{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,6 +183,30 @@ Global
 		{9C673D21-FE59-4358-B400-C945FC8E2A07}.Release|x64.Build.0 = Release|Any CPU
 		{9C673D21-FE59-4358-B400-C945FC8E2A07}.Release|x86.ActiveCfg = Release|Any CPU
 		{9C673D21-FE59-4358-B400-C945FC8E2A07}.Release|x86.Build.0 = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|Any CPU.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|Any CPU.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|x64.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|x64.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|x86.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_CONVERTER_SC|x86.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|Any CPU.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|Any CPU.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|x64.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|x64.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|x86.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.BTSET_Converter_THIRD|x86.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|x64.Build.0 = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{0183EA7E-2CDD-45C3-827E-3A4C04A259C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

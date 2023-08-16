@@ -8,10 +8,12 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
+		string curDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		Directory.SetCurrentDirectory(curDir);
 #if false
         await ExtractArchive("ED6_DT33");
 #else
-        if (args.Length == 0)
+		if (args.Length == 0)
         {
 
             var versionString = Assembly.GetEntryAssembly()?

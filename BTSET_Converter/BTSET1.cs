@@ -35,9 +35,9 @@ internal class BTSET1 : BTSET
 				hash = md5.ComputeHash(stream);
 			}
 		}
-		Data = await File.ReadAllBytesAsync(filePath);
-		if (Data.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
-		Coverage = new bool[Data.Length];
+		Bytes = await File.ReadAllBytesAsync(filePath);
+		if (Bytes.Length > UInt16.MaxValue) throw new InvalidDataException("file too big!");
+		Coverage = new bool[Bytes.Length];
 
 		if (Convert.ToHexString(hash) == "26D79AFD5B5F48ABF19772B62EF4F5E3") //hack to distinguish between SC and THIRD
 		{

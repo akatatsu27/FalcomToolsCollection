@@ -2,6 +2,8 @@
 using BTSET_Converter;
 using Newtonsoft.Json;
 
+string curDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+Directory.SetCurrentDirectory(curDir);
 #if DEBUG
 FC_BTLSET set = new();
 await set.Parse("T_BTLSET._DT");
@@ -73,7 +75,7 @@ internal partial class Program
         byte oneOrTwoOrFC = 0;
         if (attr.HasFlag(FileAttributes.Directory))
         {
-            string dirName = args[0].Split(Path.DirectorySeparatorChar).Last();
+            string dirName = args[0].Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Last();
 			if (dirName == "T_BTSET1")
                 oneOrTwoOrFC = 1;
             else if (dirName == "T_BTSET2")
@@ -94,7 +96,7 @@ internal partial class Program
                 Console.WriteLine($"empty folder: {args[0]}");
                 goto END;
             }
-            IEnumerable<string> fNames = filenames.Select(w => w.Split(Path.DirectorySeparatorChar).Last());
+            IEnumerable<string> fNames = filenames.Select(w => w.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Last());
             string missingFiles = "";
             if (!fNames.Contains(Bonuses)) missingFiles += $"{Bonuses}\n";
             if (!fNames.Contains(Models)) missingFiles += $"{Models}\n";
@@ -120,7 +122,7 @@ internal partial class Program
         }
         else
         {
-            string fName = args[0].Split(Path.DirectorySeparatorChar).Last();
+            string fName = args[0].Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Last();
             if (fName == "T_BTSET1._DT")
             {
                 oneOrTwoOrFC = 1;   
