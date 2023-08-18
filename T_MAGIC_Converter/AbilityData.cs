@@ -7,13 +7,13 @@ namespace T_MAGIC_Converter;
 public class AbilityData
 {
 	public ushort ID;
-	public ushort AbilityFlags;
+	public AbilityFlagEnum AbilityFlags;
 	public ElementEnum Element;
-	public byte Target;
+	public AbilityTarget Target;
 	public EffectEnum Effect1;
 	public EffectEnum Effect2;
-	public AbilityTarget TargetA;
-	public AbilityTarget TargetB;
+	public ushort TargetParam1;
+	public ushort TargetParam2;
 	public ushort ChantDuration;
 	public ushort CooldownDuration;
 	public ushort Cost;
@@ -44,13 +44,13 @@ public class AbilityData
 	public AbilityData(ref ushort curOffset, FileClass mS_File)
 	{
 		ID = mS_File.ReadUInt16(ref curOffset);
-		AbilityFlags = mS_File.ReadUInt16(ref curOffset);
+		AbilityFlags = (AbilityFlagEnum)mS_File.ReadUInt16(ref curOffset);
 		Element = (ElementEnum)mS_File.ReadUInt8(ref curOffset);
-		Target = mS_File.ReadUInt8(ref curOffset);
+		Target = (AbilityTarget)mS_File.ReadUInt8(ref curOffset);
 		Effect1 = (EffectEnum)mS_File.ReadUInt8(ref curOffset);
 		Effect2 = (EffectEnum)mS_File.ReadUInt8(ref curOffset);
-		TargetA = (AbilityTarget)mS_File.ReadUInt16(ref curOffset);
-		TargetB = (AbilityTarget)mS_File.ReadUInt16(ref curOffset);
+		TargetParam1 = mS_File.ReadUInt16(ref curOffset);
+		TargetParam2 = mS_File.ReadUInt16(ref curOffset);
 		ChantDuration = mS_File.ReadUInt16(ref curOffset);
 		CooldownDuration = mS_File.ReadUInt16(ref curOffset);
 		Cost = mS_File.ReadUInt16(ref curOffset);
@@ -73,13 +73,13 @@ public class AbilityData
 		fixed (byte* bytes = byteArray)
 		{
 			*(ushort*)bytes = ID;
-			*(ushort*)&bytes[2] = AbilityFlags;
+			*(ushort*)&bytes[2] = (ushort)AbilityFlags;
 			bytes[4] = (byte)Element;
-			bytes[5] = Target;
+			bytes[5] = (byte)Target;
 			byteArray[6] = (byte)Effect1;
 			byteArray[7] = (byte)Effect2;
-			*(ushort*)&bytes[8] = (ushort)TargetA;
-			*(ushort*)&bytes[10] = (ushort)TargetB;
+			*(ushort*)&bytes[8] = TargetParam1;
+			*(ushort*)&bytes[10] = TargetParam2;
 			*(ushort*)&bytes[12] = ChantDuration;
 			*(ushort*)&bytes[14] = CooldownDuration;
 			*(ushort*)&bytes[16] = Cost;
@@ -96,5 +96,5 @@ public class AbilityData
 		}
 		return byteArray;
 	}
-	public ushort Size => (ushort)(32 + Name.ToSHIFTJIS_CString().Length + Description.ToSHIFTJIS_CString().Length);
+	[JsonIgnore] public ushort Size => (ushort)(32 + Name.ToSHIFTJIS_CString().Length + Description.ToSHIFTJIS_CString().Length);
 }

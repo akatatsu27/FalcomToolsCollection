@@ -13,3 +13,5 @@ AS_ConverterPlusPlus/out/
 
 AS_ConverterPlusPlus/outbin/
 *.pdb
+*.user
+*.pubxml

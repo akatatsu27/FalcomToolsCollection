@@ -1,6 +1,6 @@
 ﻿namespace Shared;
 
-public enum AbilityTarget : ushort
+public enum AbilityTarget : byte
 {
 	NONE = 0,
 	WALK_TARGET = 1,
