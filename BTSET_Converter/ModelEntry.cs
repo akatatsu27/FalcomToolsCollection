@@ -19,7 +19,7 @@ internal class ModelEntry
 
         Unk00 = file.ReadUInt16(ref offset);
         NameOffset = file.ReadUInt16(ref offset);
-        Filename = file.ReadString(ref offset);
+        Filename = file.ReadShiftJISString(ref offset);
     }
 
     //For Newtonsoft only

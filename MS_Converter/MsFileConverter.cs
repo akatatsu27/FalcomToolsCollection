@@ -8,12 +8,17 @@ namespace MS_Converter;
 
 internal static partial class MsFileConverter
 {
+	static MsFileConverter()
+	{
+		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		ShiftJis = Encoding.GetEncoding("shift-jis");
+	}
 	private static readonly JsonSerializerSettings JsonSettings = new()
 	{
 		ContractResolver = new KaitaiResolver(),
 		Converters = new List<JsonConverter>() { new ByteArrayConverter(), new StringEnumConverter() }
 	};
-
+	private static readonly Encoding ShiftJis;
 	public static async Task ToJsonFromFolderAsync(string folderPath)
 	{
 		IEnumerable<string> files = Directory.EnumerateFiles(folderPath, "MS*._DT");
@@ -54,8 +59,7 @@ internal static partial class MsFileConverter
 	{
 		#region serialization
 		MS_File ms = JsonConvert.DeserializeObject<MS_File>(await File.ReadAllTextAsync(filePath), JsonSettings);
-		Encoding encoding = Encoding.GetEncoding("shift-jis");
-		BinaryWriter bw = new(new MemoryStream(), Encoding.GetEncoding("shift-jis"));
+		BinaryWriter bw = new(new MemoryStream(), ShiftJis);
 		bw.Write(ms.AS_Index);
 		bw.Write(ms.AS_dir);
 		bw.Write(ms.Level);
@@ -141,9 +145,9 @@ internal static partial class MsFileConverter
 			bw.Write(ms.AbilityData[i].ToByteArray());
 		}
 		bw.Write(ms.UnkBeforeName);
-		bw.Write(encoding.GetBytes(ms.Name));
+		bw.Write(ShiftJis.GetBytes(ms.Name));
 		bw.Write((byte)0x00);
-		bw.Write(encoding.GetBytes(ms.Description));
+		bw.Write(ShiftJis.GetBytes(ms.Description));
 		bw.Write((byte)0x00);
 		#endregion
 		byte[] asBytes = (bw.BaseStream as MemoryStream).ToArray();

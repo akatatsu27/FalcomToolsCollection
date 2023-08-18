@@ -1,7 +1,17 @@
-﻿namespace Shared;
+﻿using System.Text;
+
+namespace Shared;
 
 public class FileClass
 {
+	static FileClass()
+	{
+		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		ShiftJIS = Encoding.GetEncoding("shift-jis");
+	}
+
+	private static readonly Encoding ShiftJIS;
+
 	protected byte[]? Bytes;
 	protected bool[]? Coverage; // set to true if the byte has been read at least once. If all true => full coverage
 	protected bool IsFullCoverage => Coverage.All(w => w == true);
@@ -33,11 +43,22 @@ public class FileClass
 		return num;
 	}
 
-	public string ReadString(ref UInt16 position)
+	public string ReadASCIIString(ref UInt16 position)
 	{
 		UInt16 length = 0;
 		while (Bytes[position + length] != 0) length++;
-		string theString = System.Text.Encoding.ASCII.GetString(Bytes, position, length);
+		string theString = Encoding.ASCII.GetString(Bytes, position, length);
+		for (int i = 0; i <= length; i++)
+		{
+			Coverage[position++] |= true;
+		}
+		return theString;
+	}
+	public string ReadShiftJISString(ref UInt16 position)
+	{
+		UInt16 length = 0;
+		while (Bytes[position + length] != 0) length++;
+		string theString = ShiftJIS.GetString(Bytes, position, length);
 		for (int i = 0; i <= length; i++)
 		{
 			Coverage[position++] |= true;

@@ -205,8 +205,8 @@ public class MS_File : FileClass
 		{
 			UnkBeforeName[i] = ReadUInt8(ref curOffset);
 		}
-		Name = ReadString(ref curOffset);
-		Description = ReadString(ref curOffset);
+		Name = ReadShiftJISString(ref curOffset);
+		Description = ReadShiftJISString(ref curOffset);
 
 		//Debug.Assert(IsFullCoverage);
 		if (!IsFullCoverage)

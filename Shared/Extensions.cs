@@ -1,6 +1,6 @@
 ﻿using System.Buffers.Binary;
+using System.Numerics;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Shared;
 
@@ -71,5 +71,17 @@ public static class Extensions
 	public static byte Lower(this ushort number)
 	{
 		return (byte)(number & 0xff);
+	}
+
+	public static bool IsSorted<T>(this IList<T> list) where T : INumber<T>
+	{
+		for (int i = 1; i < list.Count; i++)
+		{
+			if (list[i - 1] > list[i])
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }

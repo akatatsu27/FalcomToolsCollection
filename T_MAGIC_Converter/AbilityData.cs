@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics;
+using Newtonsoft.Json;
 using Shared;
 
 namespace T_MAGIC_Converter;
@@ -33,6 +34,13 @@ public class AbilityData
 	/// </summary>
 	public string Description;
 
+	/// <summary>
+	/// Helper field used only during serialization
+	/// </summary>
+	[JsonIgnore] public ushort Offset;
+
+	public AbilityData() { }
+
 	public AbilityData(ref ushort curOffset, FileClass mS_File)
 	{
 		ID = mS_File.ReadUInt16(ref curOffset);
@@ -53,37 +61,40 @@ public class AbilityData
 		Effect2Duration = mS_File.ReadUInt16(ref curOffset);
 		NameOffset = mS_File.ReadUInt16(ref curOffset);
 		DescriptionOffset = mS_File.ReadUInt16(ref curOffset);
-		Name = mS_File.ReadString(ref curOffset);
-		Description = mS_File.ReadString(ref curOffset);
+		Name = mS_File.ReadShiftJISString(ref curOffset);
+		Description = mS_File.ReadShiftJISString(ref curOffset);
 	}
 
-	public unsafe byte[] ToByteArray(ref ushort curOffset)
+	public unsafe byte[] ToByteArray()
 	{
-		byte[] byteArray = new byte[32 + Name.Length + 1 + Description.Length + 1];
+		byte[] nameBytes = Name.ToSHIFTJIS_CString();
+		byte[] descBytes = Description.ToSHIFTJIS_CString();
+		byte[] byteArray = new byte[32 + nameBytes.Length + descBytes.Length];
 		fixed (byte* bytes = byteArray)
 		{
 			*(ushort*)bytes = ID;
-			*(ushort*)bytes[2] = AbilityFlags;
+			*(ushort*)&bytes[2] = AbilityFlags;
 			bytes[4] = (byte)Element;
 			bytes[5] = Target;
 			byteArray[6] = (byte)Effect1;
 			byteArray[7] = (byte)Effect2;
-			*(ushort*)bytes[8] = (ushort)TargetA;
-			*(ushort*)bytes[10] = (ushort)TargetB;
-			*(ushort*)bytes[12] = ChantDuration;
-			*(ushort*)bytes[14] = CooldownDuration;
-			*(ushort*)bytes[16] = Cost;
-			*(ushort*)bytes[18] = Unk_12;
-			*(ushort*)bytes[20] = Effect1Power;
-			*(ushort*)bytes[22] = Effect1Duration;
-			*(ushort*)bytes[24] = Effect2Power;
-			*(ushort*)bytes[26] = Effect2Duration;
-			*(ushort*)bytes[28] = (ushort)(curOffset + 32); //NameOffset
-			*(ushort*)bytes[30] = (ushort)(curOffset + 32 + Name.Length + 1); //DescriptionOffset
-			Name.ToSHIFTJIS_CString().CopyTo(byteArray, 32);
-			Description.ToSHIFTJIS_CString().CopyTo(byteArray, 32 + Name.Length + 1);
+			*(ushort*)&bytes[8] = (ushort)TargetA;
+			*(ushort*)&bytes[10] = (ushort)TargetB;
+			*(ushort*)&bytes[12] = ChantDuration;
+			*(ushort*)&bytes[14] = CooldownDuration;
+			*(ushort*)&bytes[16] = Cost;
+			*(ushort*)&bytes[18] = Unk_12;
+			*(ushort*)&bytes[20] = Effect1Power;
+			*(ushort*)&bytes[22] = Effect1Duration;
+			*(ushort*)&bytes[24] = Effect2Power;
+			*(ushort*)&bytes[26] = Effect2Duration;
+			*(ushort*)&bytes[28] = (ushort)(Offset + 32); //NameOffset
+			*(ushort*)&bytes[30] = (ushort)(Offset + 32 + nameBytes.Length); //DescriptionOffset
+			
+			nameBytes.CopyTo(byteArray, 32);
+			descBytes.CopyTo(byteArray, 32 + nameBytes.Length);
 		}
-		curOffset += (ushort)(32 + Name.Length + 1 + Description.Length + 1);
 		return byteArray;
 	}
+	public ushort Size => (ushort)(32 + Name.ToSHIFTJIS_CString().Length + Description.ToSHIFTJIS_CString().Length);
 }
